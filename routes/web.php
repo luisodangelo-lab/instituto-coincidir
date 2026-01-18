@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Http\Controllers\Auth\FirstAccessController;
 use App\Http\Controllers\Auth\DniLoginController;
 use App\Http\Controllers\Admin\UserAdminController;
+use App\Http\Controllers\Auth\PasswordResetOtpController;
 
 
 Route::get('/', function () {
@@ -79,3 +80,10 @@ Route::prefix('admin')
         Route::get('/users/create', [UserAdminController::class, 'create'])->name('admin.users.create');
         Route::post('/users/create', [UserAdminController::class, 'store'])->name('admin.users.store');
     });
+
+Route::get('/reset-password', [PasswordResetOtpController::class, 'show'])->name('reset.show');
+Route::post('/reset-password', [PasswordResetOtpController::class, 'sendOtp'])->name('reset.send');
+Route::get('/reset-password/verify', [PasswordResetOtpController::class, 'showVerify'])->name('reset.verify');
+Route::post('/reset-password/verify', [PasswordResetOtpController::class, 'verify'])->name('reset.verify.post');
+Route::get('/reset-password/new', [PasswordResetOtpController::class, 'showPassword'])->name('reset.password');
+Route::post('/reset-password/new', [PasswordResetOtpController::class, 'setPassword'])->name('reset.password.post');

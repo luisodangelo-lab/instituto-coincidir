@@ -18,6 +18,7 @@
 
   <form method="post" action="{{ route('login.post') }}">
     @csrf
+    <p><a href="/reset-password">Olvidé mi contraseña</a></p>
 
     <label>DNI</label><br>
     <input name="dni" value="{{ old('dni') }}" style="width:100%; padding:10px; margin:8px 0;">
