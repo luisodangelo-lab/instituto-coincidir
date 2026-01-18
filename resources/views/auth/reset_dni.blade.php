@@ -1,27 +1,26 @@
-<!doctype html>
-<html lang="es">
-<head><meta charset="utf-8"><title>Recuperar contraseña</title></head>
-<body style="font-family: Arial; max-width: 480px; margin: 40px auto;">
+@extends('layouts.app')
+
+@section('title', 'Recuperar contraseña')
+
+@section('content')
   <h2>Recuperar contraseña</h2>
+  <p>Ingresá tu DNI para recibir un código por WhatsApp.</p>
 
   @if (session('info'))
-    <p style="background:#cff4fc; padding:10px;">{{ session('info') }}</p>
-  @endif
-
-  @if ($errors->any())
-    <div style="color:#b00020;"><ul>
-      @foreach ($errors->all() as $e) <li>{{ $e }}</li> @endforeach
-    </ul></div>
+    <div class="flash info">{{ session('info') }}</div>
   @endif
 
   <form method="post" action="{{ route('reset.send') }}">
     @csrf
-    <label>DNI</label><br>
-    <input name="dni" value="{{ old('dni') }}" style="width:100%; padding:10px; margin:8px 0;">
-    <button style="padding:10px 14px;">Enviar código</button>
+
+    <label>DNI</label>
+    <input name="dni" value="{{ old('dni') }}">
+
+    <div style="height:14px"></div>
+
+    <button>Enviar código</button>
   </form>
 
   <hr>
   <p>¿Es tu primer ingreso? <a href="/first-access">Primer acceso</a></p>
-</body>
-</html>
+@endsection
