@@ -99,6 +99,11 @@
       background: rgba(255,255,255,.10);
     }
 
+    nav a.active{
+    background: rgba(255,255,255,.12);
+    opacity: 1;
+    }
+
     /* Layout */
     .container{
       max-width: 1040px;
@@ -192,6 +197,12 @@
 
     footer{ color:var(--muted); font-size: 12px; padding: 18px 0; }
 
+
+  @media (max-width: 640px){
+  nav{ justify-content:flex-start; }
+  nav a{ padding:6px 8px; }
+  }
+
     /* Small screens */
     @media (max-width: 560px){
       .brand span{ display:none; } /* deja solo el badge + nombre corto */
@@ -205,7 +216,12 @@
 <header>
   <div class="topbar">
     <div class="brand">
-      <div class="brand-badge">IC</div>
+      <div class="brand-badge" style="background: transparent; box-shadow:none;">
+  <img src="{{ asset('assets/logoi.png') }}"
+       alt="Instituto Coincidir"
+       style="height:32px; width:auto; display:block;">
+</div>
+
       <div>
         <div>Instituto Coincidir</div>
         <small>Campus & Gestión Académica</small>
@@ -235,9 +251,10 @@
       @endauth
 
       @guest
-        <a href="{{ route('login') }}">Ingresar</a>
-        <a href="{{ route('first_access.show') }}">Primer acceso</a>
-        <a href="{{ route('reset.show') }}">Recuperar</a>
+      <a href="{{ route('login') }}" class="{{ request()->routeIs('login') ? 'active' : '' }}">Ingresar</a>
+      <a href="{{ route('first_access.show') }}" class="{{ request()->routeIs('first_access.*') ? 'active' : '' }}">Primer acceso</a>
+      <a href="{{ route('reset.show') }}" class="{{ request()->routeIs('reset.*') ? 'active' : '' }}">Recuperar</a>
+
       @endguest
     </nav>
   </div>
@@ -250,7 +267,11 @@
       <h1>@yield('page_title', 'Bienvenido')</h1>
       <div class="hint">@yield('page_hint', 'Accedé con DNI para ingresar al campus.')</div>
     </div>
-    <div class="hint">Entorno: {{ app()->environment() }}</div>
+
+    @if(app()->environment('local'))
+    <div class="hint" style="opacity:.75;">Entorno: local</div>
+    @endif
+
   </div>
 
   @if(session('ok'))
