@@ -276,9 +276,10 @@
     </div>
 
     <nav>
-      
+
       @auth
   <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
+  <a href="{{ route('profile.show') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">Mi perfil</a>
 
   @php
     $u = auth()->user();
@@ -301,12 +302,13 @@
 
   <span class="nav-user">
     <span class="avatar" title="{{ $u->name }}">
-      @if(!empty($u->avatar_path))
-        <img src="{{ asset('storage/'.$u->avatar_path) }}" alt="{{ $u->name }}">
-      @else
-        {{ $initials }}
-      @endif
-    </span>
+  @if(!empty($u->avatar_path) && Storage::disk('public')->exists($u->avatar_path))
+    <img src="{{ Storage::disk('public')->url($u->avatar_path) }}" alt="{{ $u->name }}">
+  @else
+    {{ $initials }}
+  @endif
+</span>
+
     <span class="nav-username">{{ $u->name }}</span>
 
     <form method="post" action="{{ route('logout') }}" style="display:inline; margin:0;">
