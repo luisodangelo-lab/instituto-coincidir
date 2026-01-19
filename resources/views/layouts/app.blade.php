@@ -104,6 +104,53 @@
     opacity: 1;
     }
 
+.nav-user{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-left:8px;
+}
+
+.avatar{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  overflow:hidden;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.10);
+  color:#fff;
+  font-weight:800;
+  font-size:12px;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.nav-username{
+  font-weight:700;
+  font-size:13px;
+  color:#fff;
+  opacity:.92;
+  max-width:180px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+@media (max-width: 640px){
+  .nav-username{ display:none; } /* en móvil dejamos solo el círculo */
+}
+
+
     /* Layout */
     .container{
       max-width: 1040px;
@@ -229,26 +276,48 @@
     </div>
 
     <nav>
+      
       @auth
-        <a href="{{ route('dashboard') }}">Dashboard</a>
+  <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
 
-        @php $r = auth()->user()->role ?? 'alumno'; @endphp
+  @php
+    $u = auth()->user();
+    $r = $u->role ?? 'alumno';
+    $name = trim($u->name ?? '');
+    $parts = preg_split('/\s+/', $name);
+    $initials = '';
+    if (!empty($parts[0])) $initials .= mb_substr($parts[0], 0, 1);
+    if (!empty($parts[1])) $initials .= mb_substr($parts[1], 0, 1);
+    $initials = $initials ?: 'IC';
+  @endphp
 
-        @if(in_array($r, ['admin','staff_l1','staff_l2','administrativo']))
-          <a href="{{ route('admin.users.create') }}">Usuarios</a>
-        @endif
+  @if(in_array($r, ['admin','staff_l1','staff_l2','administrativo']))
+    <a href="{{ route('admin.users.create') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">Usuarios</a>
+  @endif
 
-        @if(in_array($r, ['admin','staff_l1']))
-          <a href="/admin/finance">Finanzas</a>
-        @endif
+  @if(in_array($r, ['admin','staff_l1']))
+    <a href="/admin/finance">Finanzas</a>
+  @endif
 
-        <form method="post" action="{{ route('logout') }}" style="display:inline;">
-          @csrf
-          <button type="submit" class="btn-ghost" style="background: rgba(255,255,255,.12); color:#fff; border-color: rgba(255,255,255,.18);">
-            Salir
-          </button>
-        </form>
-      @endauth
+  <span class="nav-user">
+    <span class="avatar" title="{{ $u->name }}">
+      @if(!empty($u->avatar_path))
+        <img src="{{ asset('storage/'.$u->avatar_path) }}" alt="{{ $u->name }}">
+      @else
+        {{ $initials }}
+      @endif
+    </span>
+    <span class="nav-username">{{ $u->name }}</span>
+
+    <form method="post" action="{{ route('logout') }}" style="display:inline; margin:0;">
+      @csrf
+      <button type="submit" class="btn-ghost" style="background: rgba(255,255,255,.12); color:#fff; border-color: rgba(255,255,255,.18);">
+        Salir
+      </button>
+    </form>
+  </span>
+@endauth
+
 
       @guest
       <a href="{{ route('login') }}" class="{{ request()->routeIs('login') ? 'active' : '' }}">Ingresar</a>
