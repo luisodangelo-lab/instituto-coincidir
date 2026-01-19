@@ -1,50 +1,102 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <title>Admin - Crear usuario</title>
-</head>
-<body style="font-family: Arial; max-width: 720px; margin: 40px auto;">
-  <h2>Admin · Crear usuario</h2>
+@extends('layouts.app')
 
-  @if (session('ok'))
-    <p style="background:#d1e7dd; padding:10px;">{{ session('ok') }}</p>
-  @endif
+@section('title', 'Admin · Crear usuario')
+@section('page_title', 'Admin · Crear usuario')
+@section('page_hint', 'Alta rápida de usuarios (DNI como identificador).')
 
-  @if ($errors->any())
-    <div style="color:#b00020;">
-      <ul>
-        @foreach ($errors->all() as $e) <li>{{ $e }}</li> @endforeach
-      </ul>
-    </div>
-  @endif
+@section('content')
+  <h2 style="margin:0 0 6px; font-size:18px;">Crear usuario</h2>
+  <p class="muted" style="margin:0 0 14px;">
+    Completá los datos básicos. El DNI se usa como identificador de acceso.
+  </p>
 
   <form method="post" action="{{ route('admin.users.store') }}">
     @csrf
 
-    <label>Nombre</label><br>
-    <input name="name" value="{{ old('name') }}" style="width:100%; padding:10px; margin:8px 0;">
+    <div style="display:grid; gap:12px;">
+      <div>
+        <label for="name">Nombre y apellido</label>
+        <input
+          id="name"
+          name="name"
+          value="{{ old('name') }}"
+          placeholder="Ej: Juan Pérez"
+          required
+        >
+      </div>
 
-    <label>DNI</label><br>
-    <input name="dni" value="{{ old('dni') }}" style="width:100%; padding:10px; margin:8px 0;">
+      <div style="display:grid; gap:12px; grid-template-columns: 1fr 1fr;">
+        <div>
+          <label for="dni">DNI</label>
+          <input
+            id="dni"
+            name="dni"
+            value="{{ old('dni') }}"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="Ej: 30123456"
+            required
+          >
+        </div>
 
-    <label>WhatsApp</label><br>
-    <input name="phone_whatsapp" value="{{ old('phone_whatsapp') }}" placeholder="2804514348 o +5492804514348" style="width:100%; padding:10px; margin:8px 0;">
+        <div>
+          <label for="phone_whatsapp">WhatsApp</label>
+          <input
+            id="phone_whatsapp"
+            name="phone_whatsapp"
+            value="{{ old('phone_whatsapp') }}"
+            placeholder="Ej: 2804514348 o +5492804514348"
+          >
+          <div class="muted" style="margin-top:6px;">
+            Recomendado para OTP y notificaciones.
+          </div>
+        </div>
+      </div>
 
-    <label>Email (opcional)</label><br>
-    <input name="email" value="{{ old('email') }}" style="width:100%; padding:10px; margin:8px 0;">
+      <div style="display:grid; gap:12px; grid-template-columns: 1fr 1fr;">
+        <div>
+          <label for="email">Email (opcional)</label>
+          <input
+            id="email"
+            name="email"
+            value="{{ old('email') }}"
+            autocomplete="email"
+            placeholder="Ej: nombre@dominio.com"
+          >
+        </div>
 
-    <label>Rol</label><br>
-    <select name="role" style="width:100%; padding:10px; margin:8px 0;">
-      @foreach (['alumno','docente','administrativo','staff_l1','staff_l2','admin'] as $r)
-        <option value="{{ $r }}" @selected(old('role','alumno')===$r)>{{ $r }}</option>
-      @endforeach
-    </select>
+        <div>
+          <label for="role">Rol</label>
+          <select id="role" name="role">
+            @foreach (['alumno','docente','administrativo','staff_l1','staff_l2','admin'] as $r)
+              <option value="{{ $r }}" @selected(old('role','alumno')===$r)>{{ $r }}</option>
+            @endforeach
+          </select>
+          <div class="muted" style="margin-top:6px;">
+            staff_l2: sin finanzas (según criterio del campus).
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <button style="padding:10px 14px;">Crear</button>
+    <div class="actions">
+      <button type="submit" class="btn-primary">Crear usuario</button>
+      <a href="{{ route('dashboard') }}" class="btn-ghost" style="text-decoration:none; display:inline-flex; align-items:center;">
+        Volver al Dashboard
+      </a>
+    </div>
+
+    <hr>
+
+    <div class="muted">
+      Nota: si el usuario no tiene contraseña, deberá hacer <a href="{{ route('first_access.show') }}">Primer acceso</a>.
+    </div>
   </form>
 
-  <hr>
-  <p><a href="/dashboard">Volver al Dashboard</a></p>
-</body>
-</html>
+  <style>
+    /* Solo para que el grid no se rompa en mobile */
+    @media (max-width: 720px){
+      form div[style*="grid-template-columns"]{ grid-template-columns: 1fr !important; }
+    }
+  </style>
+@endsection
