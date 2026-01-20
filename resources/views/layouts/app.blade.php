@@ -280,6 +280,10 @@
       @auth
   <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
   <a href="{{ route('profile.show') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">Mi perfil</a>
+  <a href="{{ route('my.installments') }}">Mis cuotas</a>
+  <a href="{{ route('admin.courses.index') }}">Cursos</a>
+  <a href="{{ route('admin.enrollments.index') }}">Matrículas</a>
+
 
   @php
     $u = auth()->user();
@@ -297,7 +301,8 @@
   @endif
 
   @if(in_array($r, ['admin','staff_l1']))
-    <a href="/admin/finance">Finanzas</a>
+    <a href="{{ route('finance.payments.index') }}">Finanzas</a>
+
   @endif
 
   <span class="nav-user">
@@ -307,6 +312,12 @@
   @else
     {{ $initials }}
   @endif
+
+@if(in_array($r, ['admin','staff_l1','administrativo']))
+  <a href="{{ route('finance.payments.index') }}">Pagos</a>
+@endif
+
+
 </span>
 
     <span class="nav-username">{{ $u->name }}</span>

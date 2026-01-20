@@ -17,7 +17,11 @@
    @if(!empty($u->avatar_path) && Storage::disk('public')->exists($u->avatar_path))
   <img src="{{ Storage::disk('public')->url($u->avatar_path) }}" alt="{{ $u->name }}">
 @else
-  {{ $ini }}
+@php
+  $ini = mb_strtoupper(mb_substr(trim($u->name ?? 'U'), 0, 1));
+@endphp
+{{ $ini }}
+
 @endif
 
     </div>
