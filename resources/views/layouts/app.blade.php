@@ -277,17 +277,11 @@
 
     <nav>
 
-      @auth
-  <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
-  <a href="{{ route('profile.show') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">Mi perfil</a>
-  <a href="{{ route('my.installments') }}">Mis cuotas</a>
-  <a href="{{ route('admin.courses.index') }}">Cursos</a>
-  <a href="{{ route('admin.enrollments.index') }}">Matrículas</a>
-
-
+   @auth
   @php
     $u = auth()->user();
     $r = $u->role ?? 'alumno';
+
     $name = trim($u->name ?? '');
     $parts = preg_split('/\s+/', $name);
     $initials = '';
@@ -296,29 +290,36 @@
     $initials = $initials ?: 'IC';
   @endphp
 
-  @if(in_array($r, ['admin','staff_l1','staff_l2','administrativo']))
+  <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
+  <a href="{{ route('profile.show') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">Mi perfil</a>
+  <a href="{{ route('my.installments') }}" class="{{ request()->routeIs('my.installments') ? 'active' : '' }}">Mis cuotas</a>
+
+  {{-- Académico (solo roles permitidos) --}}
+  @if(in_array($r, ['admin','staff_l1','staff_l2','administrativo','docente'], true)
+      && \Illuminate\Support\Facades\Route::has('admin.academic.home'))
+    <a href="{{ route('admin.academic.home') }}" class="{{ request()->routeIs('admin.academic.*') ? 'active' : '' }}">Académico</a>
+  @endif
+
+  {{-- Usuarios --}}
+  @if(in_array($r, ['admin','staff_l1','staff_l2','administrativo'], true)
+      && \Illuminate\Support\Facades\Route::has('admin.users.create'))
     <a href="{{ route('admin.users.create') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">Usuarios</a>
   @endif
 
-  @if(in_array($r, ['admin','staff_l1']))
-    <a href="{{ route('finance.payments.index') }}">Finanzas</a>
-
+  {{-- Finanzas --}}
+  @if(in_array($r, ['admin','staff_l1','administrativo'], true)
+      && \Illuminate\Support\Facades\Route::has('finance.payments.index'))
+    <a href="{{ route('finance.payments.index') }}" class="{{ request()->routeIs('finance.*') ? 'active' : '' }}">Finanzas</a>
   @endif
 
   <span class="nav-user">
     <span class="avatar" title="{{ $u->name }}">
-  @if(!empty($u->avatar_path) && Storage::disk('public')->exists($u->avatar_path))
-    <img src="{{ Storage::disk('public')->url($u->avatar_path) }}" alt="{{ $u->name }}">
-  @else
-    {{ $initials }}
-  @endif
-
-@if(in_array($r, ['admin','staff_l1','administrativo']))
-  <a href="{{ route('finance.payments.index') }}">Pagos</a>
-@endif
-
-
-</span>
+      @if(!empty($u->avatar_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($u->avatar_path))
+        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($u->avatar_path) }}" alt="{{ $u->name }}">
+      @else
+        {{ $initials }}
+      @endif
+    </span>
 
     <span class="nav-username">{{ $u->name }}</span>
 
@@ -330,6 +331,7 @@
     </form>
   </span>
 @endauth
+
 
 
       @guest

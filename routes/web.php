@@ -19,38 +19,54 @@ use App\Http\Controllers\Admin\FinancePaymentsController;
 use App\Http\Controllers\My\MyInstallmentsController;
 use App\Http\Controllers\My\MyPaymentsController;
 
-use App\Http\Controllers\Admin\CoursesController;
-use App\Http\Controllers\Admin\CohortsController;
-use App\Http\Controllers\Admin\EnrollmentsController;
 
-// LECTURA académica (admin, staff_l1, staff_l2, administrativo, docente)
-Route::prefix('admin')
+use App\Http\Controllers\Admin\Academic\CoursesController as AcademicCoursesController;
+use App\Http\Controllers\Admin\Academic\CohortsController as AcademicCohortsController;
+use App\Http\Controllers\Admin\Academic\EnrollmentsController as AcademicEnrollmentsController;
+
+Route::prefix('admin/academic')
   ->middleware(['auth','role:admin,staff_l1,staff_l2,administrativo,docente'])
   ->group(function () {
-      Route::get('/enrollments', [EnrollmentsController::class, 'index'])->name('admin.enrollments.index');
-      Route::get('/enrollments/{enrollment}', [EnrollmentsController::class, 'show'])->name('admin.enrollments.show');
 
-      Route::get('/courses', [CoursesController::class, 'index'])->name('admin.courses.index');
-      Route::get('/courses/{course}/cohorts', [CohortsController::class, 'index'])->name('admin.cohorts.index');
-  });
+    Route::get('/', fn() => redirect()->route('admin.academic.courses.index'))
+      ->name('admin.academic.home');
 
-// ESCRITURA académica (admin, staff_l1, administrativo)
-Route::prefix('admin')
-  ->middleware(['auth','role:admin,staff_l1,administrativo'])
-  ->group(function () {
-      Route::get('/courses/create', [CoursesController::class, 'create'])->name('admin.courses.create');
-      Route::post('/courses/create', [CoursesController::class, 'store'])->name('admin.courses.store');
-      Route::get('/courses/{course}/edit', [CoursesController::class, 'edit'])->name('admin.courses.edit');
-      Route::post('/courses/{course}/edit', [CoursesController::class, 'update'])->name('admin.courses.update');
+    // Cursos
+    Route::get('/courses', [AcademicCoursesController::class,'index'])
+      ->name('admin.academic.courses.index');
 
-      Route::get('/courses/{course}/cohorts/create', [CohortsController::class, 'create'])->name('admin.cohorts.create');
-      Route::post('/courses/{course}/cohorts/create', [CohortsController::class, 'store'])->name('admin.cohorts.store');
-      Route::get('/courses/{course}/cohorts/{cohort}/edit', [CohortsController::class, 'edit'])->name('admin.cohorts.edit');
-      Route::post('/courses/{course}/cohorts/{cohort}/edit', [CohortsController::class, 'update'])->name('admin.cohorts.update');
+    Route::get('/courses/create', [AcademicCoursesController::class,'create'])
+      ->middleware('role:admin,staff_l1,administrativo')
+      ->name('admin.academic.courses.create');
 
-      Route::get('/enrollments/create', [EnrollmentsController::class, 'create'])->name('admin.enrollments.create');
-      Route::post('/enrollments/create', [EnrollmentsController::class, 'store'])->name('admin.enrollments.store');
-  });
+    Route::post('/courses', [AcademicCoursesController::class,'store'])
+      ->middleware('role:admin,staff_l1,administrativo')
+      ->name('admin.academic.courses.store');
+
+    // Cohortes (por curso)
+    Route::get('/courses/{course}/cohorts/create', [AcademicCohortsController::class,'create'])
+      ->middleware('role:admin,staff_l1,administrativo')
+      ->name('admin.academic.cohorts.create');
+
+    Route::post('/courses/{course}/cohorts', [AcademicCohortsController::class,'store'])
+      ->middleware('role:admin,staff_l1,administrativo')
+      ->name('admin.academic.cohorts.store');
+
+    // Matrículas/inscripciones
+    Route::get('/enrollments/create', [AcademicEnrollmentsController::class,'create'])
+      ->middleware('role:admin,staff_l1,administrativo')
+      ->name('admin.academic.enrollments.create');
+
+    Route::post('/enrollments', [AcademicEnrollmentsController::class,'store'])
+      ->middleware('role:admin,staff_l1,administrativo')
+      ->name('admin.academic.enrollments.store');
+
+    // Generar cuotas
+    Route::post('/enrollments/{enrollment}/installments/generate', [AcademicEnrollmentsController::class,'generateInstallments'])
+      ->middleware('role:admin,staff_l1,administrativo')
+      ->name('admin.academic.enrollments.installments.generate');
+});
+
 
 
 Route::get('/', function () {

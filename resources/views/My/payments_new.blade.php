@@ -8,11 +8,14 @@
   <form method="post" action="{{ route('my.payments.store') }}" enctype="multipart/form-data">
     @csrf
 
+    {{-- Si viene desde "Pagar" de una cuota --}}
+    <input type="hidden" name="installment_id" value="{{ old('installment_id', request('installment_id')) }}">
+
     <label>Curso / matrícula (opcional)</label>
     <select name="enrollment_id">
       <option value="">(sin seleccionar)</option>
       @foreach($enrollments as $enr)
-        <option value="{{ $enr->id }}">
+        <option value="{{ $enr->id }}" @selected(old('enrollment_id', request('enrollment_id')) == $enr->id)>
           {{ $enr->cohort->course->title }} — {{ $enr->cohort->name }}
         </option>
       @endforeach
@@ -21,7 +24,7 @@
     <div style="height:10px"></div>
 
     <label>Monto</label>
-    <input name="amount" value="{{ old('amount') }}">
+    <input name="amount" value="{{ old('amount', request('amount')) }}">
 
     <div style="height:10px"></div>
 
@@ -35,7 +38,7 @@
     <div style="height:10px"></div>
 
     <label>Referencia (alias/ID MP/observación)</label>
-    <input name="reference" value="{{ old('reference') }}">
+    <input name="reference" value="{{ old('reference', request('reference')) }}">
 
     <div style="height:10px"></div>
 

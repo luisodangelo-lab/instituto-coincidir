@@ -12,8 +12,22 @@ class MyPaymentsController extends Controller
     public function create(Request $request)
     {
         $u = $request->user();
-        $enrollments = $u->enrollments()->with('cohort.course')->latest()->get();
-        return view('my.payments_new', compact('u','enrollments'));
+
+        $enrollments = Enrollment::with(['cohort.course'])
+            ->where('user_id', $u->id)
+            ->orderByDesc('id')
+            ->get();
+
+        // Prefill desde querystring (?enrollment_id=&amount=&reference=)
+        $prefill = [
+            'enrollment_id' => $request->query('enrollment_id'),
+            'amount'        => $request->query('amount'),
+            'reference'     => $request->query('reference'),
+            // lo dejamos por si viene, pero no lo usamos aún:
+            'installment_id'=> $request->query('installment_id'),
+        ];
+
+        return view('my.payments_create', compact('enrollments', 'prefill'));
     }
 
     public function store(Request $request)

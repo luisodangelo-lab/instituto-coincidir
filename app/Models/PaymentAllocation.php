@@ -6,13 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class PaymentAllocation extends Model
 {
-    protected $fillable = [
-        'payment_id','installment_id','amount','created_by',
-    ];
+    protected $table = 'payment_allocations';
 
-    protected $casts = [
-        'amount' => 'decimal:2',
-    ];
+    // Permitir create([...]) sin problemas
+    protected $guarded = [];
 
     public function payment()
     {
