@@ -24,6 +24,25 @@ use App\Http\Controllers\Admin\Academic\CoursesController as AcademicCoursesCont
 use App\Http\Controllers\Admin\Academic\CohortsController as AcademicCohortsController;
 use App\Http\Controllers\Admin\Academic\EnrollmentsController as AcademicEnrollmentsController;
 
+use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\PreinscriptionController;
+
+Route::get('/cursos', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/cursos/{course:code}', [CatalogController::class, 'show'])->name('catalog.show');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/cohortes/{cohort}/preinscribir', [PreinscriptionController::class, 'store'])
+        ->name('preinscriptions.store');
+});
+
+    Route::get('/courses/{course}/edit', [AcademicCoursesController::class,'edit'])
+      ->middleware('role:admin,staff_l1,administrativo')
+      ->name('admin.academic.courses.edit');
+
+    Route::put('/courses/{course}', [AcademicCoursesController::class,'update'])
+      ->middleware('role:admin,staff_l1,administrativo')
+      ->name('admin.academic.courses.update');
+
 Route::prefix('admin/academic')
   ->middleware(['auth','role:admin,staff_l1,staff_l2,administrativo,docente'])
   ->group(function () {
