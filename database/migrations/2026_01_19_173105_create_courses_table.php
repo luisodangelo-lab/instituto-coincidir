@@ -1,14 +1,31 @@
-public function up(): void
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
 {
-    Schema::create('courses', function (Blueprint $table) {
-        $table->id();
-        $table->string('code')->unique();           // ej: TEC-ADM-2026, CUR-EXCEL-01
-        $table->string('title');
-        $table->text('description')->nullable();
+    public function up(): void
+    {
+        Schema::create('courses', function (Blueprint $table) {
+            $table->id();
 
-        $table->string('type')->default('curso');   // curso | tecnicatura
-        $table->boolean('is_active')->default(true);
+            $table->string('code')->unique();
+            $table->string('title');
+            $table->text('description')->nullable();
 
-        $table->timestamps();
-    });
-}
+            // Lo que ya venías usando en SQLite
+            $table->unsignedInteger('months')->nullable();
+            $table->string('modality')->nullable();
+            $table->boolean('is_active')->default(true);
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('courses');
+    }
+};
