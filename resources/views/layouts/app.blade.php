@@ -13,8 +13,13 @@
       --text:#0f172a;
       --muted:#64748b;
       --border:#e5e7eb;
-      --brand:#0b1220;
-      --brand2:#111827;
+
+      /* Nuevo color de marca: azul oscuro moderno */
+      --nav:#0b1f3a;      /* base */
+      --nav2:#08172c;     /* un toque más oscuro (hover/fondo) */
+      --navLine: rgba(255,255,255,.10);
+      --navHover: rgba(255,255,255,.10);
+
       --primary:#2563eb;
       --primary2:#1d4ed8;
 
@@ -36,25 +41,27 @@
 
     a{ color:inherit; }
 
-    /* Header */
+    /* Header (más compacto) */
     header{
       position: sticky;
       top:0;
       z-index: 50;
-      background: rgba(11,18,32,.92);
+      background: rgba(11,31,58,.92); /* azul oscuro con transparencia */
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid var(--navLine);
       color:#fff;
     }
+
     .topbar{
       max-width: 1040px;
       margin:0 auto;
-      padding: 12px 16px;
+      padding: 8px 14px; /* ↓ menos alto */
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
     }
+
     .brand{
       display:flex;
       align-items:center;
@@ -62,99 +69,178 @@
       font-weight:800;
       letter-spacing:.2px;
       white-space:nowrap;
+      min-width: 220px;
     }
+
     .brand-badge{
-      width:34px; height:34px;
+      width:30px; height:30px; /* ↓ más chico */
       border-radius:10px;
-      background: linear-gradient(135deg, rgba(37,99,235,.95), rgba(14,165,233,.90));
-      box-shadow: 0 8px 24px rgba(37,99,235,.25);
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      font-weight:900;
+      overflow:hidden;
+    }
+
+    .brand h2{
+      margin:0;
+      font-size:14px; /* ↓ más chico */
+      line-height:1.15;
+      font-weight:800;
     }
     .brand small{
       display:block;
       font-weight:600;
-      opacity:.75;
-      font-size:12px;
-      margin-top:-2px;
+      opacity:.78;
+      font-size:11px; /* ↓ más chico */
+      margin-top:1px;
     }
 
+    /* NAV */
     nav{
       display:flex;
       align-items:center;
-      gap:10px;
+      gap:8px;
       flex-wrap:wrap;
       justify-content:flex-end;
     }
-    nav a{
+
+    .nav-link, .nav-btn{
       text-decoration:none;
       opacity:.92;
-      padding:8px 10px;
+      padding:7px 10px;   /* ↓ compacto */
       border-radius:10px;
+      font-size:13px;
+      line-height:1;
+      border:1px solid transparent;
+      background: transparent;
+      color:#fff;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      user-select:none;
     }
-    nav a:hover{
+
+    .nav-link:hover, .nav-btn:hover{
       opacity:1;
+      background: var(--navHover);
+      border-color: rgba(255,255,255,.10);
+    }
+
+    .nav-link.active{
+      background: rgba(255,255,255,.14);
+      opacity: 1;
+      border-color: rgba(255,255,255,.12);
+    }
+
+    /* Dropdown */
+    .dd{
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+    }
+    .dd-menu{
+      position:absolute;
+      right:0;
+      top: calc(100% + 8px);
+      min-width: 220px;
+      background: rgba(8,23,44,.98);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 6px;
+      box-shadow: 0 18px 46px rgba(0,0,0,.35);
+      display:none;
+    }
+    .dd.open .dd-menu{ display:block; }
+
+    .dd-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 10px;
+      border-radius: 12px;
+      text-decoration:none;
+      color:#fff;
+      font-size:13px;
+      opacity:.92;
+    }
+    .dd-item:hover{
       background: rgba(255,255,255,.10);
+      opacity:1;
+    }
+    .dd-sep{
+      height:1px;
+      background: rgba(255,255,255,.10);
+      margin: 6px 6px;
+    }
+    .dd-hint{
+      font-size:11px;
+      opacity:.70;
+      padding: 6px 10px 4px;
     }
 
-    nav a.active{
-    background: rgba(255,255,255,.12);
-    opacity: 1;
+    /* User chip */
+    .nav-user{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-left:6px;
+      padding-left:6px;
+      border-left: 1px solid rgba(255,255,255,.10);
     }
 
-.nav-user{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-left:8px;
-}
+    .avatar{
+      width:32px;
+      height:32px;
+      border-radius:999px;
+      overflow:hidden;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.10);
+      color:#fff;
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.6px;
+      text-transform:uppercase;
+    }
 
-.avatar{
-  width:34px;
-  height:34px;
-  border-radius:999px;
-  overflow:hidden;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border:1px solid rgba(255,255,255,.18);
-  background: rgba(255,255,255,.10);
-  color:#fff;
-  font-weight:800;
-  font-size:12px;
-  letter-spacing:.6px;
-  text-transform:uppercase;
-}
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
 
-.avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
+    .nav-username{
+      font-weight:700;
+      font-size:13px;
+      color:#fff;
+      opacity:.92;
+      max-width:160px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
-.nav-username{
-  font-weight:700;
-  font-size:13px;
-  color:#fff;
-  opacity:.92;
-  max-width:180px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-@media (max-width: 640px){
-  .nav-username{ display:none; } /* en móvil dejamos solo el círculo */
-}
-
+    .btn-logout{
+      background: rgba(255,255,255,.12);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.18);
+      padding:7px 10px;
+      border-radius:10px;
+      font-weight:700;
+      font-size:13px;
+      cursor:pointer;
+    }
+    .btn-logout:hover{ background: rgba(255,255,255,.16); }
 
     /* Layout */
     .container{
       max-width: 1040px;
-      margin: 18px auto;
+      margin: 16px auto;
       padding: 0 16px;
     }
     .page-head{
@@ -211,48 +297,22 @@
     }
     .muted{ color:var(--muted); font-size: 12px; }
 
-    .actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin-top: 14px;
-    }
-
-    button{
-      appearance:none;
-      border:0;
-      cursor:pointer;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-weight:700;
-    }
-    .btn-primary{
-      background: linear-gradient(180deg, var(--primary), var(--primary2));
-      color:#fff;
-      box-shadow: 0 10px 24px rgba(37,99,235,.22);
-    }
-    .btn-primary:hover{ filter: brightness(1.03); }
-    .btn-ghost{
-      background: #f1f5f9;
-      color:#0f172a;
-      border: 1px solid var(--border);
-    }
-    .btn-ghost:hover{ background:#eaf0f7; }
-
     hr{ border:0; border-top:1px solid var(--border); margin: 14px 0; }
-
     footer{ color:var(--muted); font-size: 12px; padding: 18px 0; }
 
+    /* Responsive */
+    @media (max-width: 820px){
+      .brand small{ display:none; } /* achica visual */
+    }
 
-  @media (max-width: 640px){
-  nav{ justify-content:flex-start; }
-  nav a{ padding:6px 8px; }
-  }
+    @media (max-width: 640px){
+      .nav-username{ display:none; }
+      nav{ justify-content:flex-start; }
+      .topbar{ padding: 8px 12px; }
+      .brand{ min-width:auto; }
+    }
 
-    /* Small screens */
     @media (max-width: 560px){
-      .brand span{ display:none; } /* deja solo el badge + nombre corto */
       .page-head{ flex-direction:column; align-items:flex-start; }
       .card{ padding: 14px; border-radius: 14px; }
     }
@@ -260,85 +320,122 @@
 </head>
 
 <body>
+
 <header>
   <div class="topbar">
     <div class="brand">
-      <div class="brand-badge" style="background: transparent; box-shadow:none;">
-  <img src="{{ asset('assets/logoi.png') }}"
-       alt="Instituto Coincidir"
-       style="height:32px; width:auto; display:block;">
-</div>
+      <div class="brand-badge" style="background: transparent;">
+        <img src="{{ asset('assets/logoi.png') }}"
+             alt="Instituto Coincidir"
+             style="height:28px; width:auto; display:block;">
+      </div>
 
       <div>
-        <div>Instituto Coincidir</div>
+        <h2>Instituto Coincidir</h2>
         <small>Campus & Gestión Académica</small>
       </div>
     </div>
 
     <nav>
+      @auth
+        @php
+  $u = auth()->user();
+  $r = $u->role ?? 'alumno';
 
-   @auth
-  @php
-    $u = auth()->user();
-    $r = $u->role ?? 'alumno';
+  $name = trim($u->name ?? '');
+  $parts = preg_split('/\s+/', $name);
+  $initials = '';
+  if (!empty($parts[0])) $initials .= mb_substr($parts[0], 0, 1);
+  if (!empty($parts[1])) $initials .= mb_substr($parts[1], 0, 1);
+  $initials = $initials ?: 'IC';
 
-    $name = trim($u->name ?? '');
-    $parts = preg_split('/\s+/', $name);
-    $initials = '';
-    if (!empty($parts[0])) $initials .= mb_substr($parts[0], 0, 1);
-    if (!empty($parts[1])) $initials .= mb_substr($parts[1], 0, 1);
-    $initials = $initials ?: 'IC';
-  @endphp
+  // Permisos por rol + existencia de rutas
+  $canAcademic = in_array($r, ['admin','staff_l1','staff_l2','administrativo','docente'], true)
+    && \Illuminate\Support\Facades\Route::has('admin.academic.home');
 
-  <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
-  <a href="{{ route('profile.show') }}" class="{{ request()->routeIs('profile.*') ? 'active' : '' }}">Mi perfil</a>
-  <a href="{{ route('my.installments') }}" class="{{ request()->routeIs('my.installments') ? 'active' : '' }}">Mis cuotas</a>
+  $canUsers = in_array($r, ['admin','staff_l1','staff_l2','administrativo'], true)
+    && \Illuminate\Support\Facades\Route::has('admin.users.create');
 
-  {{-- Académico (solo roles permitidos) --}}
-  @if(in_array($r, ['admin','staff_l1','staff_l2','administrativo','docente'], true)
-      && \Illuminate\Support\Facades\Route::has('admin.academic.home'))
-    <a href="{{ route('admin.academic.home') }}" class="{{ request()->routeIs('admin.academic.*') ? 'active' : '' }}">Académico</a>
-  @endif
+  $canFinance = in_array($r, ['admin','staff_l1','administrativo'], true)
+    && \Illuminate\Support\Facades\Route::has('finance.payments.index');
 
-  {{-- Usuarios --}}
-  @if(in_array($r, ['admin','staff_l1','staff_l2','administrativo'], true)
-      && \Illuminate\Support\Facades\Route::has('admin.users.create'))
-    <a href="{{ route('admin.users.create') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">Usuarios</a>
-  @endif
+  $hasMgmt = ($canAcademic || $canUsers || $canFinance);
+@endphp
 
-  {{-- Finanzas --}}
-  @if(in_array($r, ['admin','staff_l1','administrativo'], true)
-      && \Illuminate\Support\Facades\Route::has('finance.payments.index'))
-    <a href="{{ route('finance.payments.index') }}" class="{{ request()->routeIs('finance.*') ? 'active' : '' }}">Finanzas</a>
-  @endif
+{{-- Accesos principales --}}
+<a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
+<a href="{{ route('my.installments') }}" class="nav-link {{ request()->routeIs('my.installments') ? 'active' : '' }}">Mis cuotas</a>
 
-  <span class="nav-user">
-    <span class="avatar" title="{{ $u->name }}">
-      @if(!empty($u->avatar_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($u->avatar_path))
-        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($u->avatar_path) }}" alt="{{ $u->name }}">
-      @else
-        {{ $initials }}
+{{-- Gestión (solo si corresponde) --}}
+@if($hasMgmt)
+  <div class="dd" data-dd>
+    <button type="button"
+            class="nav-btn {{ request()->routeIs('admin.academic.*') || request()->routeIs('admin.users.*') || request()->routeIs('finance.*') ? 'active' : '' }}"
+            data-dd-btn>
+      Gestión <span style="opacity:.8;">▾</span>
+    </button>
+
+    <div class="dd-menu" data-dd-menu>
+      <div class="dd-hint">Accesos según tu rol</div>
+
+      @if($canAcademic)
+        <a class="dd-item" href="{{ route('admin.academic.home') }}">
+          <span>🎓 Académico</span><span style="opacity:.65;">→</span>
+        </a>
       @endif
-    </span>
 
-    <span class="nav-username">{{ $u->name }}</span>
+      @if($canUsers)
+        <a class="dd-item" href="{{ route('admin.users.create') }}">
+          <span>👥 Usuarios</span><span style="opacity:.65;">→</span>
+        </a>
+      @endif
 
-    <form method="post" action="{{ route('logout') }}" style="display:inline; margin:0;">
-      @csrf
-      <button type="submit" class="btn-ghost" style="background: rgba(255,255,255,.12); color:#fff; border-color: rgba(255,255,255,.18);">
-        Salir
-      </button>
-    </form>
-  </span>
-@endauth
+      @if($canFinance)
+        <a class="dd-item" href="{{ route('finance.payments.index') }}">
+          <span>💳 Finanzas</span><span style="opacity:.65;">→</span>
+        </a>
+      @endif
+    </div>
+  </div>
+@endif
+
+{{-- Mi cuenta lo dejás como estaba en la versión anterior --}}
 
 
+        {{-- Dropdown Mi cuenta (perfil + salir) --}}
+        <div class="dd nav-user" data-dd>
+          <span class="avatar" title="{{ $u->name }}">
+            @if(!empty($u->avatar_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($u->avatar_path))
+              <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($u->avatar_path) }}" alt="{{ $u->name }}">
+            @else
+              {{ $initials }}
+            @endif
+          </span>
+
+          <span class="nav-username">{{ $u->name }}</span>
+
+          <button type="button" class="nav-btn" data-dd-btn>
+            Mi cuenta <span style="opacity:.8;">▾</span>
+          </button>
+
+          <div class="dd-menu" data-dd-menu>
+            <a class="dd-item" href="{{ route('profile.show') }}">Mi perfil</a>
+            <div class="dd-sep"></div>
+            <form method="post" action="{{ route('logout') }}" style="margin:0;">
+              @csrf
+              <button type="submit" class="dd-item" style="width:100%; text-align:left; background:transparent; border:0;">
+                Salir
+              </button>
+            </form>
+          </div>
+        </div>
+
+      @endauth
 
       @guest
-      <a href="{{ route('login') }}" class="{{ request()->routeIs('login') ? 'active' : '' }}">Ingresar</a>
-      <a href="{{ route('first_access.show') }}" class="{{ request()->routeIs('first_access.*') ? 'active' : '' }}">Primer acceso</a>
-      <a href="{{ route('reset.show') }}" class="{{ request()->routeIs('reset.*') ? 'active' : '' }}">Recuperar</a>
-
+        <a href="{{ route('login') }}" class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">Ingresar</a>
+        <a href="{{ route('first_access.show') }}" class="nav-link {{ request()->routeIs('first_access.*') ? 'active' : '' }}">Primer acceso</a>
+        <a href="{{ route('reset.show') }}" class="nav-link {{ request()->routeIs('reset.*') ? 'active' : '' }}">Recuperar</a>
       @endguest
     </nav>
   </div>
@@ -353,9 +450,8 @@
     </div>
 
     @if(app()->environment('local'))
-    <div class="hint" style="opacity:.75;">Entorno: local</div>
+      <div class="hint" style="opacity:.75;">Entorno: local</div>
     @endif
-
   </div>
 
   @if(session('ok'))
@@ -385,6 +481,32 @@
     <div class="muted">© {{ date('Y') }} Fundación Coincidir</div>
   </footer>
 </main>
+
+<script>
+  // Dropdowns: abre/cierra y cierra al click afuera o ESC (sin librerías)
+  (function(){
+    const dds = document.querySelectorAll('[data-dd]');
+    function closeAll(except){
+      dds.forEach(dd => { if(dd !== except) dd.classList.remove('open'); });
+    }
+
+    dds.forEach(dd => {
+      const btn = dd.querySelector('[data-dd-btn]');
+      if(!btn) return;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = dd.classList.contains('open');
+        closeAll(dd);
+        dd.classList.toggle('open', !isOpen);
+      });
+    });
+
+    document.addEventListener('click', () => closeAll(null));
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') closeAll(null);
+    });
+  })();
+</script>
 
 </body>
 </html>
