@@ -38,7 +38,8 @@ class FirstAccessController extends Controller
         $res = $otp->createChallenge($user->id, 'first_access', $request->ip());
 
         // Enviar OTP por WhatsApp (DEV: queda en log)
-        $wa->sendOtp($user->phone_whatsapp, $res['code_plain']);
+        $wa->sendOtp($user->phone_whatsapp, $otp['code'], 'first_access');
+
 
         // Guardar en sesión para el siguiente paso
         session([

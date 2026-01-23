@@ -36,7 +36,8 @@ class PasswordResetOtpController extends Controller
         }
 
         $res = $otp->createChallenge($user->id, 'password_reset', $request->ip());
-        $wa->sendOtp($user->phone_whatsapp, $res['code_plain']);
+        $wa->sendOtp($user->phone_whatsapp, $otp['code'], 'password_reset');
+
 
         session([
             'pr_user_id' => $user->id,
