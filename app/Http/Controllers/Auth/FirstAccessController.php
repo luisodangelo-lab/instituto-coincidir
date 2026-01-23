@@ -20,6 +20,7 @@ class FirstAccessController extends Controller
     }
 
     public function sendOtp(Request $request, OtpService $otp)
+
     {
         $data = $request->validate([
             'dni' => ['required','string','max:16'],
