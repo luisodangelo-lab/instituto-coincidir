@@ -33,9 +33,11 @@ class OtpService
         ]);
 
         return [
-            'challenge' => $challenge,
-            'code_plain' => $code, // en prod NO se devuelve; acá sirve para modo dev
-        ];
+    'challenge' => $challenge,
+    'challenge_id' => $challenge->id,
+    'code_plain' => $code, // se usa para enviar el email (no se muestra al usuario)
+];
+
     }
 
     public function verify(int $challengeId, string $codeInput, ?string $ip): bool
