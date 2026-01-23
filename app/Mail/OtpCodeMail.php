@@ -13,6 +13,7 @@ class OtpCodeMail extends Mailable
     public function __construct(
         public string $code,
         public string $purpose = 'first_access',
+        public string $expiresHuman = '10 minutos',
         public string $name = ''
     ) {}
 
@@ -28,7 +29,10 @@ class OtpCodeMail extends Mailable
                 'code' => $this->code,
                 'purpose' => $this->purpose,
                 'name' => $this->name,
-                'ttl' => '10 minutos',
+                // ✅ lo que tu blade está pidiendo
+                'expiresHuman' => $this->expiresHuman,
+                // ✅ compat: por si en algún lado usa ttl
+                'ttl' => $this->expiresHuman,
             ]);
     }
 }

@@ -43,8 +43,10 @@ class FirstAccessController extends Controller
         // 2) Enviar mail con el código
         try {
             Mail::to($user->email)->send(
-                new OtpCodeMail($res['code_plain'], 'first_access', $user->name ?? '')
-            );
+    new \App\Mail\OtpCodeMail($res['code_plain'], 'first_access', '10 minutos', $user->name ?? '')
+);
+
+           
         } catch (\Throwable $e) {
             report($e);
             return back()->withErrors(['dni' => 'No pudimos enviar el código por email. Intentá de nuevo.']);
