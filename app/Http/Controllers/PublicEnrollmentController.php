@@ -14,7 +14,8 @@ class PublicEnrollmentController extends Controller
 {
     public function show(Request $request, $course)
     {
-        $course = Course::where('id', $course)->orWhere('slug', $course)->firstOrFail();
+       $course = Course::where('id', $course)->orWhere('code', $course)->firstOrFail();
+
 
         $cohort = Cohort::where('course_id', $course->id)
             ->where('is_active', 1)   // ajustá si tu columna se llama distinto
@@ -28,7 +29,8 @@ class PublicEnrollmentController extends Controller
 
     public function store(Request $request, $course)
     {
-        $course = Course::where('id', $course)->orWhere('slug', $course)->firstOrFail();
+        $course = Course::where('id', $course)->orWhere('code', $course)->firstOrFail();
+
 
         $cohort = Cohort::where('course_id', $course->id)
             ->where('is_active', 1)
@@ -77,8 +79,12 @@ class PublicEnrollmentController extends Controller
         if (empty($enr->public_token)) {
             $enr->public_token = Str::random(48);
         }
-        $enr->status = 'preinscripto';
-        $enr->save();
+        // si ya está inscripto, no lo retrocedas
+if (!in_array($enr->status, ['inscripto','baja'], true)) {
+    $enr->status = 'preinscripto';
+}
+$enr->save();
+
 
         // 3) email automático (simple)
         $receiptUrl = route('public.receipt.show', ['token' => $enr->public_token]);
@@ -121,6 +127,11 @@ class PublicEnrollmentController extends Controller
         $enr->receipt_path = $path;
         $enr->receipt_original_name = $file->getClientOriginalName();
         $enr->receipt_uploaded_at = now();
+        
+        if ($enr->status === 'preinscripto') {
+    $enr->status = 'pendiente_pago';
+}
+
         $enr->save();
 
         // Aviso simple al alumno
