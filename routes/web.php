@@ -27,6 +27,22 @@ use App\Http\Controllers\Admin\Academic\EnrollmentsController as AcademicEnrollm
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\PreinscriptionController;
 
+
+use App\Http\Controllers\PublicEnrollmentController;
+
+Route::get('/inscribirme/{course}', [PublicEnrollmentController::class, 'show'])
+    ->name('public.enroll.show');
+
+Route::post('/inscribirme/{course}', [PublicEnrollmentController::class, 'store'])
+    ->name('public.enroll.store');
+
+Route::get('/comprobante/{token}', [PublicEnrollmentController::class, 'showReceipt'])
+    ->name('public.receipt.show');
+
+Route::post('/comprobante/{token}', [PublicEnrollmentController::class, 'storeReceipt'])
+    ->name('public.receipt.store');
+
+
 Route::get('/cursos', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/cursos/{course:code}', [CatalogController::class, 'show'])->name('catalog.show');
 
