@@ -9,10 +9,7 @@
     <a href="{{ route('catalog.index') }}" class="text-decoration-none">&larr; Volver a cursos</a>
   </div>
 
-  @if(session('ok'))
-    <div class="alert alert-success">{{ session('ok') }}</div>
-  @endif
-
+  
   @if($errors->any())
     <div class="alert alert-danger">
       <div class="fw-semibold mb-1">Revisá lo siguiente:</div>
@@ -40,10 +37,16 @@
 @endphp
 
 <div class="d-flex gap-2">
-  <a class="btn btn-outline-secondary" href="{{ route('catalog.index') }}">Ver todos</a>
+  @php
+  $cohorts = $course->cohorts ?? collect();
+  $openCohorts = $cohorts->filter(fn($c) => (int) data_get($c, 'is_active', 0) === 1);
+@endphp
 
-  @if($activeCohort)
-    <a class="btn btn-primary" href="{{ route('public.enroll.show', $course) }}">
+<div class="d-flex gap-2 align-items-center">
+  <a class="btn btn-outline-secondary" href="{{ route('catalog.index') }}">← Volver a cursos</a>
+
+  @if($openCohorts->count() > 0)
+    <a class="btn btn-primary" href="{{ route('public.enroll.show', $course->code) }}">
       Inscribirme
     </a>
   @else
@@ -51,15 +54,9 @@
   @endif
 </div>
 
-  @if($course->cohorts->count() > 0)
-    <a class="btn btn-primary" href="{{ route('public.enroll.show', $course) }}">
-      Inscribirme
-    </a>
-  @else
-    <button class="btn btn-primary" disabled>Inscribirme</button>
-  @endif
 </div>
 
+  
       </div>
 
       @if($course->description)
