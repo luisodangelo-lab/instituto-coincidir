@@ -67,7 +67,8 @@
       </div>
     @endif
 
-    <form method="POST" action="{{ route('public.enroll.store', $course) }}">
+<form method="POST" action="{{ route('public.enroll.store', $course) }}">
+
       @csrf
 
       <label>Nombre y apellido</label>

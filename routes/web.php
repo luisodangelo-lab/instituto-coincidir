@@ -63,6 +63,25 @@ Route::prefix('admin/academic')
   ->middleware(['auth','role:admin,staff_l1,staff_l2,administrativo,docente'])
   ->group(function () {
 
+    // Preinscripciones (preinscripto / pendiente_pago)
+    Route::get('/preinscripciones', [AcademicEnrollmentsController::class,'preinscriptions'])
+    ->middleware('role:admin,staff_l1,administrativo')
+    ->name('admin.academic.preinscriptions.index');
+
+    Route::post('/enrollments/{enrollment}/mark-inscripto', [AcademicEnrollmentsController::class,'markInscripto'])
+    ->middleware('role:admin,staff_l1,administrativo')
+    ->name('admin.academic.enrollments.mark_inscripto');
+
+
+    Route::get('/preinscripciones', [AcademicEnrollmentsController::class,'preinscriptions'])
+    ->middleware('role:admin,staff_l1,administrativo')
+    ->name('admin.academic.preinscriptions.index');
+
+    Route::post('/enrollments/{enrollment}/mark-inscripto', [AcademicEnrollmentsController::class,'markInscripto'])
+    ->middleware('role:admin,staff_l1,administrativo')
+    ->name('admin.academic.enrollments.mark_inscripto');
+
+
     Route::get('/', fn() => redirect()->route('admin.academic.courses.index'))
       ->name('admin.academic.home');
 

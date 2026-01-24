@@ -17,6 +17,29 @@ class EnrollmentsController extends Controller
         return view('admin.academic.enrollments_create', compact('cohorts'));
     }
 
+public function preinscriptions()
+{
+    $rows = \App\Models\Enrollment::with(['user','cohort','cohort.course'])
+        ->whereIn('status', ['preinscripto','pendiente_pago'])
+        ->orderByRaw("FIELD(status,'pendiente_pago','preinscripto')")
+        ->orderByDesc('updated_at')
+        ->paginate(30);
+
+    return view('admin.academic.preinscriptions.index', compact('rows'));
+}
+
+public function markInscripto(\App\Models\Enrollment $enrollment)
+{
+    // no tocar si ya está inscripto o baja
+    if (!in_array($enrollment->status, ['inscripto','baja'], true)) {
+        $enrollment->status = 'inscripto';
+        $enrollment->save();
+    }
+
+    return back()->with('ok', 'Inscripción marcada como INSCRIPTO.');
+}
+
+
     public function store(Request $request, InstallmentService $svc)
     {
         $data = $request->validate([
@@ -52,4 +75,27 @@ class EnrollmentsController extends Controller
             ? "Cuotas generadas: {$created}"
             : "No se generaron cuotas (ya existían).");
     }
+
+    public function preinscriptions()
+    {
+        $rows = \App\Models\Enrollment::with(['user','cohort','cohort.course'])
+            ->whereIn('status', ['preinscripto','pendiente_pago'])
+            ->orderByRaw("FIELD(status,'pendiente_pago','preinscripto')")
+            ->orderByDesc('updated_at')
+            ->paginate(30);
+
+        return view('admin.academic.preinscriptions.index', compact('rows'));
+    }
+
+    public function markInscripto(\App\Models\Enrollment $enrollment)
+    {
+        if (!in_array($enrollment->status, ['inscripto','baja'], true)) {
+            $enrollment->status = 'inscripto';
+            $enrollment->save();
+        }
+
+        return back()->with('ok', 'Inscripción marcada como INSCRIPTO.');
+    }
+
+
 }

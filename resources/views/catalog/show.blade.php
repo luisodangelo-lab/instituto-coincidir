@@ -35,8 +35,21 @@
           </div>
         </div>
 
-        <div class="d-flex gap-2">
+        @php
+  $activeCohort = $course->cohorts->firstWhere('is_active', 1);
+@endphp
+
+<div class="d-flex gap-2">
   <a class="btn btn-outline-secondary" href="{{ route('catalog.index') }}">Ver todos</a>
+
+  @if($activeCohort)
+    <a class="btn btn-primary" href="{{ route('public.enroll.show', $course) }}">
+      Inscribirme
+    </a>
+  @else
+    <button class="btn btn-primary" disabled>Inscribirme</button>
+  @endif
+</div>
 
   @if($course->cohorts->count() > 0)
     <a class="btn btn-primary" href="{{ route('public.enroll.show', $course) }}">
@@ -85,10 +98,15 @@
                   <td class="text-end">{{ (int)$cohort->installments_count }}</td>
                   <td class="text-end">
                    <td class="text-end">
-  <a class="btn btn-primary" href="{{ route('public.enroll.show', $course) }}">
-    Inscribirme
-  </a>
+  @if(($cohort->is_active ?? 0) == 1)
+    <a class="btn btn-primary" href="{{ route('public.enroll.show', $course) }}">
+      Inscribirme
+    </a>
+  @else
+    <span class="badge text-bg-secondary">Cerrada</span>
+  @endif
 </td>
+
 
                   </td>
                 </tr>

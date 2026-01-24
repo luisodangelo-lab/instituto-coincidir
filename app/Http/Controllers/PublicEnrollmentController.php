@@ -9,12 +9,17 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class PublicEnrollmentController extends Controller
 {
     public function show(Request $request, $course)
     {
-       $course = Course::where('id', $course)->orWhere('code', $course)->firstOrFail();
+       $course = Course::where('id', $course)
+    ->orWhere('code', $course)
+    ->orWhere('slug', $course)
+    ->firstOrFail();
+
 
 
         $cohort = Cohort::where('course_id', $course->id)
@@ -29,7 +34,11 @@ class PublicEnrollmentController extends Controller
 
     public function store(Request $request, $course)
     {
-        $course = Course::where('id', $course)->orWhere('code', $course)->firstOrFail();
+        $course = Course::where('id', $course)
+        ->orWhere('code', $course)
+        ->orWhere('slug', $course)
+        ->firstOrFail();
+
 
 
         $cohort = Cohort::where('course_id', $course->id)
@@ -86,15 +95,31 @@ if (!in_array($enr->status, ['inscripto','baja'], true)) {
 $enr->save();
 
 
-        // 3) email automático (simple)
-        $receiptUrl = route('public.receipt.show', ['token' => $enr->public_token]);
+   // 3) email automático (simple)
+$receiptUrl  = route('public.receipt.show', ['token' => $enr->public_token]);
+$cohortLabel = $cohort->name ?? (string) $cohort->id;
 
-        Mail::raw(
-            "Hola {$user->name}!\n\nRecibimos tu PREINSCRIPCIÓN al curso: {$course->title}.\nCohorte: {$cohort->name ?? $cohort->id}\n\nPara completar la inscripción:\n1) Realizá el pago según las indicaciones.\n2) Subí tu comprobante acá: {$receiptUrl}\n\nGracias!\nInstituto Coincidir",
-            function ($m) use ($user, $course) {
-                $m->to($user->email)->subject("Preinscripción recibida: {$course->title}");
-            }
-        );
+try {
+    Mail::raw(
+        "Hola {$user->name}!\n\n"
+        ."Recibimos tu PREINSCRIPCIÓN al curso: {$course->title}.\n"
+        ."Cohorte: {$cohortLabel}\n\n"
+        ."Para completar la inscripción:\n"
+        ."1) Realizá el pago según las indicaciones.\n"
+        ."2) Subí tu comprobante acá: {$receiptUrl}\n\n"
+        ."Gracias!\nInstituto Coincidir",
+        function ($m) use ($user, $course) {
+            $m->to($user->email)->subject("Preinscripción recibida: {$course->title}");
+        }
+    );
+} catch (\Throwable $e) {
+    \Log::warning('Mail preinscripción falló', [
+        'user_id' => $user->id ?? null,
+        'enrollment_id' => $enr->id ?? null,
+        'error' => $e->getMessage(),
+    ]);
+}
+
 
         return redirect()->route('public.receipt.show', ['token' => $enr->public_token])
             ->with('ok', 'Preinscripción registrada. Te enviamos un email con el link para subir comprobante.');
