@@ -367,115 +367,193 @@
       </div>
     </div>
 
-    <nav>
-      @auth
-        @php
-          $u = auth()->user();
-          $r = $u->role ?? 'alumno';
+    
+<nav>
+  @php
+    $hasCatalog = \Illuminate\Support\Facades\Route::has('catalog.index');
+    $isHome = (request()->path() === '');
+  @endphp
 
-          $name = trim($u->name ?? '');
-          $parts = preg_split('/\s+/', $name);
-          $initials = '';
-          if (!empty($parts[0])) $initials .= mb_substr($parts[0], 0, 1);
-          if (!empty($parts[1])) $initials .= mb_substr($parts[1], 0, 1);
-          $initials = $initials ?: 'IC';
+  {{-- Siempre visible --}}
+  <a href="{{ url('/') }}" class="nav-link {{ $isHome ? 'active' : '' }}">Inicio</a>
 
-          // Permisos por rol + existencia de rutas
-          $canAcademic = in_array($r, ['admin','staff_l1','staff_l2','administrativo','docente'], true)
-            && \Illuminate\Support\Facades\Route::has('admin.academic.home');
+  @if($hasCatalog)
+    <div class="dd" data-dd>
+      <button type="button"
+              class="nav-btn {{ request()->routeIs('catalog.*') ? 'active' : '' }}"
+              data-dd-btn>
+        Oferta Académica <span style="opacity:.8;">▾</span>
+      </button>
 
-          $canUsers = in_array($r, ['admin','staff_l1','staff_l2','administrativo'], true)
-            && \Illuminate\Support\Facades\Route::has('admin.users.create');
+      <div class="dd-menu" data-dd-menu>
+        <div class="dd-hint">Explorá la oferta</div>
 
-          $canFinance = in_array($r, ['admin','staff_l1','administrativo'], true)
-            && \Illuminate\Support\Facades\Route::has('finance.payments.index');
-
-          $hasMgmt = ($canAcademic || $canUsers || $canFinance);
-        @endphp
-
-        {{-- Accesos principales --}}
-        <a href="{{ route('dashboard') }}"
-           class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-          Dashboard
+        <a class="dd-item" href="{{ route('catalog.index') }}">
+          <span>📚 Todos los cursos</span><span style="opacity:.65;">→</span>
         </a>
 
-        <a href="{{ route('my.installments') }}"
-           class="nav-link {{ request()->routeIs('my.installments') ? 'active' : '' }}">
-          Mis cuotas
+        <div class="dd-sep"></div>
+
+        {{-- Por ahora son filtros por query; después los aplicamos en CatalogController --}}
+        <a class="dd-item" href="{{ route('catalog.index', ['cat'=>'docentes']) }}">
+          <span>👩‍🏫 Cursos para docentes</span><span style="opacity:.65;">→</span>
         </a>
+        <a class="dd-item" href="{{ route('catalog.index', ['cat'=>'oficios']) }}">
+          <span>🛠️ Cursos de oficio</span><span style="opacity:.65;">→</span>
+        </a>
+        <a class="dd-item" href="{{ route('catalog.index', ['cat'=>'tecnicaturas']) }}">
+          <span>🎓 Tecnicaturas</span><span style="opacity:.65;">→</span>
+        </a>
+        <a class="dd-item" href="{{ route('catalog.index', ['cat'=>'posgrados']) }}">
+          <span>📘 Posgrados</span><span style="opacity:.65;">→</span>
+        </a>
+      </div>
+    </div>
+  @endif
 
-        {{-- Gestión (solo si corresponde) --}}
-        @if($hasMgmt)
-          <div class="dd" data-dd>
-            <button type="button"
-                    class="nav-btn {{ request()->routeIs('admin.academic.*') || request()->routeIs('admin.users.*') || request()->routeIs('finance.*') ? 'active' : '' }}"
-                    data-dd-btn>
-              Gestión <span style="opacity:.8;">▾</span>
-            </button>
+  @auth
+    @php
+      $u = auth()->user();
+      $r = $u->role ?? 'alumno';
 
-            <div class="dd-menu" data-dd-menu>
-              <div class="dd-hint">Accesos según tu rol</div>
+      $name = trim($u->name ?? '');
+      $parts = preg_split('/\s+/', $name);
+      $initials = '';
+      if (!empty($parts[0])) $initials .= mb_substr($parts[0], 0, 1);
+      if (!empty($parts[1])) $initials .= mb_substr($parts[1], 0, 1);
+      $initials = $initials ?: 'IC';
 
-              @if($canAcademic)
-                <a class="dd-item" href="{{ route('admin.academic.home') }}">
-                  <span>🎓 Académico</span><span style="opacity:.65;">→</span>
-                </a>
-              @endif
+      // Rutas útiles (por si algo no existe)
+      $hasDashboard = \Illuminate\Support\Facades\Route::has('dashboard');
+      $hasMyInstallments = \Illuminate\Support\Facades\Route::has('my.installments');
+      $hasMyPaymentsNew = \Illuminate\Support\Facades\Route::has('my.payments.new');
 
-              @if($canUsers)
-                <a class="dd-item" href="{{ route('admin.users.create') }}">
-                  <span>👥 Usuarios</span><span style="opacity:.65;">→</span>
-                </a>
-              @endif
+      // Gestión por rol + rutas existentes
+      $canAcademic = in_array($r, ['admin','staff_l1','staff_l2','administrativo','docente'], true)
+        && \Illuminate\Support\Facades\Route::has('admin.academic.home');
 
-              @if($canFinance)
-                <a class="dd-item" href="{{ route('finance.payments.index') }}">
-                  <span>💳 Finanzas</span><span style="opacity:.65;">→</span>
-                </a>
-              @endif
-            </div>
-          </div>
+      $canPreins = in_array($r, ['admin','staff_l1','administrativo'], true)
+        && \Illuminate\Support\Facades\Route::has('admin.academic.preinscriptions.index');
+
+      $canUsers = in_array($r, ['admin','staff_l1','staff_l2','administrativo'], true)
+        && \Illuminate\Support\Facades\Route::has('admin.users.create');
+
+      $canFinance = in_array($r, ['admin','staff_l1','administrativo'], true)
+        && \Illuminate\Support\Facades\Route::has('finance.payments.index');
+
+      $hasMgmt = ($canAcademic || $canPreins || $canUsers || $canFinance);
+
+      $myActive = request()->routeIs('dashboard')
+        || request()->routeIs('my.*');
+    @endphp
+
+    {{-- Mi cursada (menos chocante que links sueltos) --}}
+    <div class="dd" data-dd>
+      <button type="button" class="nav-btn {{ $myActive ? 'active' : '' }}" data-dd-btn>
+        Mi cursada <span style="opacity:.8;">▾</span>
+      </button>
+      <div class="dd-menu" data-dd-menu>
+        <div class="dd-hint">Tus accesos</div>
+
+        @if($hasDashboard)
+          <a class="dd-item" href="{{ route('dashboard') }}">
+            <span>🏠 Dashboard</span><span style="opacity:.65;">→</span>
+          </a>
         @endif
 
-        {{-- Dropdown Mi cuenta --}}
-        <div class="dd nav-user" data-dd>
-          <span class="avatar" title="{{ $u->name }}">
-            @if(!empty($u->avatar_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($u->avatar_path))
-              <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($u->avatar_path) }}" alt="{{ $u->name }}">
-            @else
-              {{ $initials }}
-            @endif
-          </span>
+        @if($hasMyInstallments)
+          <a class="dd-item" href="{{ route('my.installments') }}">
+            <span>🧾 Mis cuotas</span><span style="opacity:.65;">→</span>
+          </a>
+        @endif
 
-          <span class="nav-username">{{ $u->name }}</span>
+        @if($hasMyPaymentsNew)
+          <a class="dd-item" href="{{ route('my.payments.new') }}">
+            <span>📤 Cargar pago</span><span style="opacity:.65;">→</span>
+          </a>
+        @endif
+      </div>
+    </div>
 
-          <button type="button" class="nav-btn" data-dd-btn>
-            Mi cuenta <span style="opacity:.8;">▾</span>
-          </button>
+    {{-- Gestión (solo si corresponde) --}}
+    @if($hasMgmt)
+      <div class="dd" data-dd>
+        <button type="button"
+                class="nav-btn {{ request()->routeIs('admin.academic.*') || request()->routeIs('admin.users.*') || request()->routeIs('finance.*') ? 'active' : '' }}"
+                data-dd-btn>
+          Gestión <span style="opacity:.8;">▾</span>
+        </button>
 
-          <div class="dd-menu" data-dd-menu>
-            <a class="dd-item" href="{{ route('profile.show') }}">
-              <span>Mi perfil</span><span style="opacity:.65;">→</span>
+        <div class="dd-menu" data-dd-menu>
+          <div class="dd-hint">Accesos según tu rol</div>
+
+          @if($canAcademic)
+            <a class="dd-item" href="{{ route('admin.academic.home') }}">
+              <span>🎓 Académico</span><span style="opacity:.65;">→</span>
             </a>
-            <div class="dd-sep"></div>
+          @endif
 
-            <form method="post" action="{{ route('logout') }}" style="margin:0;">
-              @csrf
-              <button type="submit" class="dd-item dd-item-btn dd-danger">
-                <span>Salir</span><span style="opacity:.65;">⎋</span>
-              </button>
-            </form>
-          </div>
+          @if($canPreins)
+            <a class="dd-item" href="{{ route('admin.academic.preinscriptions.index') }}">
+              <span>📝 Preinscripciones</span><span style="opacity:.65;">→</span>
+            </a>
+          @endif
+
+          @if($canUsers)
+            <a class="dd-item" href="{{ route('admin.users.create') }}">
+              <span>👥 Usuarios</span><span style="opacity:.65;">→</span>
+            </a>
+          @endif
+
+          @if($canFinance)
+            <a class="dd-item" href="{{ route('finance.payments.index') }}">
+              <span>💳 Finanzas</span><span style="opacity:.65;">→</span>
+            </a>
+          @endif
         </div>
+      </div>
+    @endif
 
-      @endauth
+    {{-- Dropdown Mi cuenta (avatar) --}}
+    <div class="dd nav-user" data-dd>
+      <span class="avatar" title="{{ $u->name }}">
+        @if(!empty($u->avatar_path) && \Illuminate\Support\Facades\Storage::disk('public')->exists($u->avatar_path))
+          <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($u->avatar_path) }}" alt="{{ $u->name }}">
+        @else
+          {{ $initials }}
+        @endif
+      </span>
 
-      @guest
-        <a href="{{ route('login') }}" class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">Ingresar</a>
-        <a href="{{ route('first_access.show') }}" class="nav-link {{ request()->routeIs('first_access.*') ? 'active' : '' }}">Primer acceso</a>
-        <a href="{{ route('reset.show') }}" class="nav-link {{ request()->routeIs('reset.*') ? 'active' : '' }}">Recuperar</a>
-      @endguest
-    </nav>
+      <span class="nav-username">{{ $u->name }}</span>
+
+      <button type="button" class="nav-btn" data-dd-btn>
+        Mi cuenta <span style="opacity:.8;">▾</span>
+      </button>
+
+      <div class="dd-menu" data-dd-menu>
+        <a class="dd-item" href="{{ route('profile.show') }}">
+          <span>Mi perfil</span><span style="opacity:.65;">→</span>
+        </a>
+        <div class="dd-sep"></div>
+
+        <form method="post" action="{{ route('logout') }}" style="margin:0;">
+          @csrf
+          <button type="submit" class="dd-item dd-item-btn dd-danger">
+            <span>Salir</span><span style="opacity:.65;">⎋</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  @endauth
+
+  @guest
+    <a href="{{ route('login') }}" class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">Ingresar</a>
+    <a href="{{ route('first_access.show') }}" class="nav-link {{ request()->routeIs('first_access.*') ? 'active' : '' }}">Primer acceso</a>
+    <a href="{{ route('reset.show') }}" class="nav-link {{ request()->routeIs('reset.*') ? 'active' : '' }}">Recuperar</a>
+  @endguest
+</nav>
+
+
   </div>
 </header>
 
