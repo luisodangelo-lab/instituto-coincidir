@@ -36,8 +36,17 @@
         </div>
 
         <div class="d-flex gap-2">
-          <a class="btn btn-outline-secondary" href="{{ route('catalog.index') }}">Ver todos</a>
-        </div>
+  <a class="btn btn-outline-secondary" href="{{ route('catalog.index') }}">Ver todos</a>
+
+  @if($course->cohorts->count() > 0)
+    <a class="btn btn-primary" href="{{ route('public.enroll.show', $course) }}">
+      Inscribirme
+    </a>
+  @else
+    <button class="btn btn-primary" disabled>Inscribirme</button>
+  @endif
+</div>
+
       </div>
 
       @if($course->description)
@@ -75,19 +84,12 @@
                   <td class="text-end">$ {{ number_format((float)$cohort->price_total, 0, ',', '.') }}</td>
                   <td class="text-end">{{ (int)$cohort->installments_count }}</td>
                   <td class="text-end">
-                    @auth
-                      <form method="POST" action="{{ route('preinscriptions.store', $cohort) }}" class="d-inline">
-                        @csrf
-                        <button class="btn btn-primary">
-                          Preinscribirme
-                        </button>
-                      </form>
-                    @else
-                      <a class="btn btn-primary"
-                         href="{{ route('login', ['next' => url()->current()]) }}">
-                        Ingresar para preinscribirme
-                      </a>
-                    @endauth
+                   <td class="text-end">
+  <a class="btn btn-primary" href="{{ route('public.enroll.show', $course) }}">
+    Inscribirme
+  </a>
+</td>
+
                   </td>
                 </tr>
               @endforeach
