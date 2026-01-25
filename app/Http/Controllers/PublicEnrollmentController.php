@@ -140,30 +140,69 @@ if (Schema::hasColumn('users', 'password') && empty($user->password)) {
     // Si NO existe public_token en tu tabla, no puede funcionar /comprobante/{token}
     abort_unless(!Schema::hasColumn('enrollments','public_token') || !empty($enr->public_token), 500, 'Falta columna public_token en enrollments.');
 
-    // 5) Mail (si falla, no rompe)
     $receiptUrl  = route('public.receipt.show', ['token' => $enr->public_token]);
-    $cohortLabel = $cohort->name ?? (string) $cohort->id;
+$cohortLabel = $cohort->name ?? (string) $cohort->id;
 
-    try {
-        Mail::raw(
-            "Hola {$user->name}!\n\n"
-            ."Recibimos tu PREINSCRIPCIÓN al curso: {$course->title}.\n"
-            ."Cohorte: {$cohortLabel}\n\n"
-            ."Para completar la inscripción:\n"
-            ."1) Realizá el pago según las indicaciones.\n"
-            ."2) Subí tu comprobante acá: {$receiptUrl}\n\n"
-            ."Gracias!\nInstituto Coincidir",
-            function ($m) use ($user, $course) {
-                $m->to($user->email)->subject("Preinscripción recibida: {$course->title}");
-            }
-        );
-    } catch (\Throwable $e) {
-        Log::warning('Mail preinscripción falló', [
-            'enrollment_id' => $enr->id ?? null,
-            'user_id' => $user->id ?? null,
-            'error' => $e->getMessage(),
-        ]);
-    }
+
+
+
+$amount = (int) ($cohort->price_ars ?? $course->price_ars ?? 0);
+$amountLine = $amount > 0
+    ? ('$' . number_format($amount, 0, ',', '.'))
+    : 'A confirmar por administración';
+
+$ref = "DNI {$user->dni} - {$course->code}";
+
+$lines = [];
+$lines[] = "Hola {$user->name}!";
+$lines[] = "";
+$lines[] = "Recibimos tu PREINSCRIPCIÓN al curso: {$course->title}.";
+$lines[] = "Cohorte: " . ($cohort->name ?? $cohort->id);
+$lines[] = "";
+$lines[] = "Para completar la inscripción:";
+$lines[] = "1) Realizá el pago.";
+$lines[] = "2) Subí el comprobante desde el link de abajo.";
+$lines[] = "";
+$lines[] = "Importe: {$amountLine}";
+$lines[] = "Referencia (ponela en el comprobante): {$ref}";
+$lines[] = "";
+
+$payCfg = config('payments', []);
+
+if (($payCfg['transfer']['enabled'] ?? false) === true) {
+    $lines[] = ($payCfg['transfer']['title'] ?? 'Transferencia bancaria') . ":";
+    foreach (($payCfg['transfer']['lines'] ?? []) as $l) $lines[] = " - {$l}";
+    $lines[] = "";
+}
+
+if (($payCfg['mp']['enabled'] ?? false) === true) {
+    $lines[] = ($payCfg['mp']['title'] ?? 'Mercado Pago') . ":";
+    foreach (($payCfg['mp']['lines'] ?? []) as $l) $lines[] = " - {$l}";
+    $lines[] = "";
+}
+
+$lines[] = "Subir comprobante:";
+$lines[] = $receiptUrl;
+$lines[] = "";
+$lines[] = "Gracias!";
+$lines[] = "Instituto Coincidir";
+
+$body = implode("\n", $lines);
+
+try {
+    Mail::raw($body, function ($m) use ($user, $course) {
+        $m->to($user->email)->subject("Instrucciones de pago — {$course->title}");
+    });
+} catch (\Throwable $e) {
+    \Log::warning('Mail instrucciones de pago falló', [
+        'user_id' => $user->id ?? null,
+        'enrollment_id' => $enr->id ?? null,
+        'error' => $e->getMessage(),
+    ]);}
+
+
+
+
 
     return redirect()->route('public.receipt.show', ['token' => $enr->public_token])
         ->with('ok', 'Preinscripción registrada. Ya podés subir tu comprobante.');
@@ -194,10 +233,30 @@ if (Schema::hasColumn('users', 'password') && empty($user->password)) {
             'enr_' . $enr->id . '_' . time() . '.' . $file->getClientOriginalExtension()
         );
 
-        // Si estas columnas existen en tu tabla enrollments, perfecto:
-        $enr->receipt_path = $path;
-        $enr->receipt_original_name = $file->getClientOriginalName();
-        $enr->receipt_uploaded_at = now();
+       // Guardar archivo (queda en storage/app/private/receipts/AAAA)
+$path = $file->storeAs(
+    'private/receipts/' . date('Y'),
+    'enr_' . $enr->id . '_' . time() . '.' . $file->getClientOriginalExtension()
+);
+
+// Guardar metadata SOLO si existen columnas
+if (Schema::hasColumn('enrollments', 'receipt_path')) {
+    $enr->receipt_path = $path;
+}
+if (Schema::hasColumn('enrollments', 'receipt_original_name')) {
+    $enr->receipt_original_name = $file->getClientOriginalName();
+}
+if (Schema::hasColumn('enrollments', 'receipt_uploaded_at')) {
+    $enr->receipt_uploaded_at = now();
+}
+
+// Cambiar estado SOLO si existe columna status
+if (Schema::hasColumn('enrollments', 'status') && $enr->status === 'preinscripto') {
+    $enr->status = 'pendiente_pago';
+}
+
+$enr->save();
+
 
         // Al subir comprobante: pasa a pendiente_pago si estaba preinscripto
         if ($enr->status === 'preinscripto') {
