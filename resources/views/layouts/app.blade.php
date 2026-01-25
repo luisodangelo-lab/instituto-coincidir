@@ -332,6 +332,15 @@
     hr{ border:0; border-top:1px solid var(--border); margin: 14px 0; }
     footer{ color:var(--muted); font-size: 12px; padding: 18px 0; }
 
+/* Clamp de texto (para tablas/listas) */
+.line-clamp-2{
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
     /* Responsive */
     @media (max-width: 820px){
       .brand small{ display:none; }

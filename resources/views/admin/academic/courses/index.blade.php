@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@section('page_title','Cursos')
+@section('page_hint','Administrá cursos y cohortes')
+
 @section('title','Cursos')
 
 @section('content')
@@ -16,9 +19,8 @@
     </div>
   </div>
 
-  @if(session('ok'))
-    <div class="alert alert-success">{{ session('ok') }}</div>
-  @endif
+
+ 
 
   <div class="card shadow-sm">
     <div class="table-responsive">
@@ -32,7 +34,8 @@
             <th class="text-end" style="width:260px;">Acciones</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="table-group-divider">
+
           @forelse($courses as $c)
             <tr>
               <td>
@@ -52,7 +55,10 @@
                 <div class="fw-semibold">{{ $c->title }}</div>
                 <div class="text-muted small">{{ $c->code }} · {{ ucfirst($c->type ?? 'curso') }}</div>
                 @if(!empty($c->description))
-                  <div class="small mt-1">{{ \Illuminate\Support\Str::limit($c->description, 120) }}</div>
+                  <div class="text-muted small mt-1 line-clamp-2">
+  {{ \Illuminate\Support\Str::limit($c->description, 240) }}
+</div>
+
                 @endif
               </td>
 
