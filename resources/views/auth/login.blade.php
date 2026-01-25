@@ -42,6 +42,21 @@
             <x-primary-button class="ms-3">
                 {{ __('Log in') }}
             </x-primary-button>
+
+            <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+  <a class="btn btn-outline-secondary" href="{{ route('first_access.show') }}">
+    Soy nuevo / Crear cuenta (Primer acceso)
+  </a>
+
+  <a class="btn btn-link" href="{{ route('reset.show') }}">
+    Olvidé mi contraseña
+  </a>
+</div>
+
+<div class="text-muted" style="margin-top:6px; font-size:.95rem;">
+  El primer acceso se hace con DNI y un código por WhatsApp. Luego creás tu contraseña.
+</div>
+
         </div>
     </form>
 </x-guest-layout>

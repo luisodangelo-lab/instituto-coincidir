@@ -84,10 +84,20 @@
                           </button>
                         </form>
                       @else
-                        <a class="btn btn-primary btn-sm"
-                           href="{{ route('login', ['next' => route('catalog.show', $course->code)]) }}">
-                          Ingresar para preinscribirme
-                        </a>
+                        @guest
+                          <a class="btn btn-primary"
+                            href="{{ route('public.enroll.show', $course->code) }}">
+                            Inscribirme
+                          </a>
+                        @endguest
+
+                        @auth
+                          <a class="btn btn-primary"
+                            href="{{ route('public.enroll.show', $course->code) }}">
+                            Inscribirme
+                          </a>
+                        @endauth
+
                       @endauth
                     </td>
                   </tr>
