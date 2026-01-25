@@ -22,11 +22,14 @@ class PublicEnrollmentController extends Controller
             ->firstOrFail();
 
         // Cohorte activa
-        $cohort = Cohort::query()
-            ->where('course_id', $course->id)
-            ->where('is_active', 1)   // si tu columna se llama distinto, avisame y lo ajustamos
-            ->orderByDesc('id')
-            ->first();
+        $cohort = Cohort::where('course_id', $course->id)
+    ->where(function ($q) {
+        $q->whereNull('end_date')
+          ->orWhereDate('end_date', '>=', now()->toDateString());
+    })
+    ->orderByDesc('id')
+    ->first();
+
 
         abort_unless($cohort, 404, 'No hay cohorte activa para este curso.');
 
@@ -40,11 +43,14 @@ class PublicEnrollmentController extends Controller
             ->orWhere('code', $course)
             ->firstOrFail();
 
-        $cohort = Cohort::query()
-            ->where('course_id', $course->id)
-            ->where('is_active', 1)
-            ->orderByDesc('id')
-            ->first();
+        $cohort = Cohort::where('course_id', $course->id)
+    ->where(function ($q) {
+        $q->whereNull('end_date')
+          ->orWhereDate('end_date', '>=', now()->toDateString());
+    })
+    ->orderByDesc('id')
+    ->first();
+
 
         abort_unless($cohort, 404, 'No hay cohorte activa para este curso.');
 
