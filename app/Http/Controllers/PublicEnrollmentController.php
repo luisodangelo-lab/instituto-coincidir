@@ -10,6 +10,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Hash;
+
+
+
+
 
 class PublicEnrollmentController extends Controller
 {
@@ -36,104 +42,133 @@ class PublicEnrollmentController extends Controller
         return view('public.enroll', compact('course', 'cohort'));
     }
 
-    public function store(Request $request, $course)
-    {
-        $course = Course::query()
-            ->where('id', $course)
-            ->orWhere('code', $course)
-            ->firstOrFail();
+public function store(Request $request, $course)
+{
+    $course = Course::query()
+        ->where('id', $course)
+        ->orWhere('code', $course)
+        ->firstOrFail();
 
-        $cohort = Cohort::where('course_id', $course->id)
-    ->where(function ($q) {
-        $q->whereNull('end_date')
-          ->orWhereDate('end_date', '>=', now()->toDateString());
-    })
-    ->orderByDesc('id')
-    ->first();
+    // Cohorte "abierta": end_date >= hoy o end_date null (porque tu DB no tiene is_active)
+    $cohort = Cohort::query()
+        ->where('course_id', $course->id)
+        ->where(function ($q) {
+            $q->whereNull('end_date')
+              ->orWhereDate('end_date', '>=', now()->toDateString());
+        })
+        ->orderByDesc('id')
+        ->first();
 
+    abort_unless($cohort, 404, 'No hay cohorte abierta para este curso.');
 
-        abort_unless($cohort, 404, 'No hay cohorte activa para este curso.');
+    $data = $request->validate([
+        'name' => ['required', 'string', 'min:3', 'max:120'],
+        'dni'  => ['required', 'string', 'min:6', 'max:16'],
+        'email' => ['required', 'email', 'max:190'],
+        'phone_whatsapp' => ['required', 'string', 'min:8', 'max:30'],
+    ]);
 
-        $data = $request->validate([
-            'name' => ['required', 'string', 'min:3', 'max:120'],
-            'dni'  => ['required', 'string', 'min:6', 'max:16'],
-            'email' => ['required', 'email', 'max:190'],
-            'phone_whatsapp' => ['required', 'string', 'min:8', 'max:30'],
-        ]);
+    $dni = preg_replace('/\D+/', '', $data['dni']);
+    $wa  = preg_replace('/\D+/', '', $data['phone_whatsapp']);
+    $email = strtolower(trim($data['email']));
 
-        $dni = preg_replace('/\D+/', '', $data['dni']);
-        $wa  = preg_replace('/\D+/', '', $data['phone_whatsapp']);
+    // 1) Buscar usuario por DNI
+    $user = User::where('dni', $dni)->first();
 
-        // 1) usuario por DNI
-        $user = User::where('dni', $dni)->first();
-
-        if ($user) {
-            // Si existe y el mail no coincide, evitamos pisar (no mezclar personas)
-            if (!empty($user->email) && strtolower($user->email) !== strtolower($data['email'])) {
-                return back()->withErrors([
-                    'email' => 'Ese DNI ya existe con otro email. Contactá a administración.'
-                ])->withInput();
-            }
-        } else {
-            $user = new User();
-            $user->dni = $dni;
+    // 2) Si NO existe por DNI, validá que el email no esté tomado por otro DNI (evita 1062)
+    if (!$user) {
+        $byEmail = User::whereRaw('LOWER(email) = ?', [$email])->first();
+        if ($byEmail && preg_replace('/\D+/', '', (string)$byEmail->dni) !== $dni) {
+            return back()->withErrors([
+                'email' => 'Ese email ya está registrado con otro DNI. Usá otro email o contactá a administración.'
+            ])->withInput();
         }
-
-        $user->name = $data['name'];
-        $user->email = $data['email'];
-        $user->phone_whatsapp = $wa;
-
-        // defaults razonables (si existen en tu tabla)
-        $user->account_state = $user->account_state ?? 'pending';
-        $user->role = $user->role ?? 'alumno';
-
-        $user->save();
-
-        // 2) enrollment preinscripto
-        $enr = Enrollment::firstOrCreate(
-            ['user_id' => $user->id, 'cohort_id' => $cohort->id],
-            ['status' => 'preinscripto']
-        );
-
-        if (empty($enr->public_token)) {
-            $enr->public_token = Str::random(48);
+        $user = new User();
+        $user->dni = $dni;
+    } else {
+        // Si existe por DNI y el email es distinto, evitamos mezclar personas
+        if (!empty($user->email) && strtolower($user->email) !== $email) {
+            return back()->withErrors([
+                'email' => 'Ese DNI ya existe con otro email. Contactá a administración.'
+            ])->withInput();
         }
-
-        // Si ya está inscripto/baja, no lo retrocedas
-        if (!in_array($enr->status, ['inscripto', 'baja'], true)) {
-            $enr->status = 'preinscripto';
-        }
-
-        $enr->save();
-
-        // 3) email automático (si falla, NO rompe)
-        $receiptUrl  = route('public.receipt.show', ['token' => $enr->public_token]);
-        $cohortLabel = $cohort->name ?? (string) $cohort->id;
-
-        try {
-            Mail::raw(
-                "Hola {$user->name}!\n\n"
-                ."Recibimos tu PREINSCRIPCIÓN al curso: {$course->title}.\n"
-                ."Cohorte: {$cohortLabel}\n\n"
-                ."Para completar la inscripción:\n"
-                ."1) Realizá el pago según las indicaciones.\n"
-                ."2) Subí tu comprobante acá: {$receiptUrl}\n\n"
-                ."Gracias!\nInstituto Coincidir",
-                function ($m) use ($user, $course) {
-                    $m->to($user->email)->subject("Preinscripción recibida: {$course->title}");
-                }
-            );
-        } catch (\Throwable $e) {
-            Log::warning('Mail preinscripción falló', [
-                'enrollment_id' => $enr->id ?? null,
-                'user_id' => $user->id ?? null,
-                'error' => $e->getMessage(),
-            ]);
-        }
-
-        return redirect()->route('public.receipt.show', ['token' => $enr->public_token])
-            ->with('ok', 'Preinscripción registrada. Te enviamos un link para subir comprobante.');
     }
+
+    // 3) Completar datos
+    $user->name  = $data['name'];
+    $user->email = $email;
+
+    // Asignar solo si existen columnas (evita "Unknown column")
+    if (Schema::hasColumn('users', 'phone_whatsapp')) {
+        $user->phone_whatsapp = $wa;
+    }
+
+    if (Schema::hasColumn('users', 'account_state') && empty($user->account_state)) {
+        $user->account_state = 'pending';
+    }
+
+    if (Schema::hasColumn('users', 'role') && empty($user->role)) {
+        $user->role = 'alumno';
+    }
+// Si la tabla exige password (no default), asignamos uno aleatorio (se cambia en Primer acceso)
+if (Schema::hasColumn('users', 'password') && empty($user->password)) {
+    $user->password = Hash::make(Str::random(32));
+}
+
+    $user->save();
+
+    // 4) Crear matrícula preinscripta (status solo si existe)
+    $attrs = ['user_id' => $user->id, 'cohort_id' => $cohort->id];
+    $defaults = [];
+
+    if (Schema::hasColumn('enrollments', 'status')) {
+        $defaults['status'] = 'preinscripto';
+    }
+
+    $enr = Enrollment::firstOrCreate($attrs, $defaults);
+
+    if (Schema::hasColumn('enrollments', 'public_token') && empty($enr->public_token)) {
+        $enr->public_token = Str::random(48);
+    }
+
+    if (Schema::hasColumn('enrollments', 'status') && !in_array($enr->status, ['inscripto','baja'], true)) {
+        $enr->status = 'preinscripto';
+    }
+
+    $enr->save();
+
+    // Si NO existe public_token en tu tabla, no puede funcionar /comprobante/{token}
+    abort_unless(!Schema::hasColumn('enrollments','public_token') || !empty($enr->public_token), 500, 'Falta columna public_token en enrollments.');
+
+    // 5) Mail (si falla, no rompe)
+    $receiptUrl  = route('public.receipt.show', ['token' => $enr->public_token]);
+    $cohortLabel = $cohort->name ?? (string) $cohort->id;
+
+    try {
+        Mail::raw(
+            "Hola {$user->name}!\n\n"
+            ."Recibimos tu PREINSCRIPCIÓN al curso: {$course->title}.\n"
+            ."Cohorte: {$cohortLabel}\n\n"
+            ."Para completar la inscripción:\n"
+            ."1) Realizá el pago según las indicaciones.\n"
+            ."2) Subí tu comprobante acá: {$receiptUrl}\n\n"
+            ."Gracias!\nInstituto Coincidir",
+            function ($m) use ($user, $course) {
+                $m->to($user->email)->subject("Preinscripción recibida: {$course->title}");
+            }
+        );
+    } catch (\Throwable $e) {
+        Log::warning('Mail preinscripción falló', [
+            'enrollment_id' => $enr->id ?? null,
+            'user_id' => $user->id ?? null,
+            'error' => $e->getMessage(),
+        ]);
+    }
+
+    return redirect()->route('public.receipt.show', ['token' => $enr->public_token])
+        ->with('ok', 'Preinscripción registrada. Ya podés subir tu comprobante.');
+}
+
 
     public function showReceipt(string $token)
     {
