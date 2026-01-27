@@ -8,7 +8,8 @@
     <a class="btn btn-ghost" href="{{ route('admin.academic.courses.index') }}">Volver</a>
   </div>
 
-  <form method="POST" action="{{ route('admin.academic.courses.store') }}" enctype="multipart/form-data">
+  <form method="POST" action="{{ route('admin.academic.courses.update', $course) }}" enctype="multipart/form-data">
+
     @csrf
 
     @include('admin.academic.courses._form')

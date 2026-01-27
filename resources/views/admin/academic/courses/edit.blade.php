@@ -9,6 +9,7 @@
   </div>
 
   <form method="POST" action="{{ route('admin.academic.courses.update', $course) }}" enctype="multipart/form-data">
+
     @csrf
     @method('PUT')
 
