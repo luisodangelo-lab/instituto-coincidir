@@ -360,6 +360,26 @@ textarea{
       .page-head{ flex-direction:column; align-items:flex-start; }
       .card{ padding: 14px; border-radius: 14px; }
     }
+
+.dd-sub { position: relative; }
+.dd-submenu{
+  display:none;
+  position:absolute;
+  top:0;
+  left:100%;
+  min-width:220px;
+  margin-left:8px;
+  background: rgba(8,23,44,.98);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 8px;
+  z-index: 50;
+}
+.dd-sub:hover > .dd-submenu { display:block; }
+.dd-sub-btn { width:100%; text-align:left; background:none; border:0; }
+
+
+
   </style>
 
   @stack('head')
@@ -501,11 +521,32 @@ textarea{
         <div class="dd-menu" data-dd-menu>
           <div class="dd-hint">Accesos según tu rol</div>
 
-          @if($canAcademic)
-            <a class="dd-item" href="{{ route('admin.academic.home') }}">
-              <span>🎓 Académico</span><span style="opacity:.65;">→</span>
-            </a>
-          @endif
+@if($canAcademic)
+  <div class="dd-sep"></div>
+
+  {{-- Submenú Académico --}}
+  <div class="dd-sub">
+    <button type="button" class="dd-item dd-sub-btn" data-dd-sub-btn>
+      <span>🎓 Académico</span>
+      <span style="opacity:.65;">▸</span>
+    </button>
+
+    <div class="dd-submenu" data-dd-submenu>
+      @if(\Illuminate\Support\Facades\Route::has('admin.academic.courses.index'))
+        <a class="dd-item" href="{{ route('admin.academic.courses.index') }}">
+          <span>📚 Cursos</span><span style="opacity:.65;">→</span>
+        </a>
+
+        {{-- Cohortes: entrás por Cursos y elegís curso --}}
+        <a class="dd-item" href="{{ route('admin.academic.courses.index') }}">
+          <span>👥 Cohortes</span><span style="opacity:.65;">→</span>
+        </a>
+      @endif
+    </div>
+  </div>
+@endif
+
+
 
           @if($canPreins)
             <a class="dd-item" href="{{ route('admin.academic.preinscriptions.index') }}">
