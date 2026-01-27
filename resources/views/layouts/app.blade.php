@@ -314,15 +314,20 @@
 
     /* Forms */
     label{ display:block; font-weight:600; margin: 10px 0 6px; font-size: 13px; color:#0f172a; }
-    input, select{
-      width:100%;
-      padding: 11px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background:#fff;
-      outline:none;
-      transition: border-color .15s, box-shadow .15s;
-    }
+input, select, textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+textarea{
+  min-height: 180px;
+  resize: vertical;
+}
+
     input:focus, select:focus{
       border-color: rgba(37,99,235,.55);
       box-shadow: 0 0 0 4px rgba(37,99,235,.15);

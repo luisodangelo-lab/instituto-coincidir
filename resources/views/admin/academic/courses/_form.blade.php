@@ -51,6 +51,24 @@
     </select>
   </div>
 </div>
+<div class="row g-3 mt-1">
+  <div class="col-md-6">
+    <label class="form-label">Descripción breve</label>
+    <textarea name="description" class="form-control" rows="10">{{ old('description', $course->description ?? '') }}</textarea>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Ejes / núcleos temáticos</label>
+    <textarea name="axes" class="form-control" rows="10">{{ old('axes', $course->axes ?? '') }}</textarea>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-12">
+    <label class="form-label">Contenidos</label>
+    <textarea name="contents" class="form-control" rows="12">{{ old('contents', $course->contents ?? '') }}</textarea>
+  </div>
+</div>
 
 {{-- Descripción + Ejes lado a lado (más anchos y altos) --}}
 <div class="row g-3 mt-1">

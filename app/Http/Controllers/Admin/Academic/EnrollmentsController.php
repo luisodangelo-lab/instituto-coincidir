@@ -76,26 +76,6 @@ public function markInscripto(\App\Models\Enrollment $enrollment)
             : "No se generaron cuotas (ya existían).");
     }
 
-    public function preinscriptions()
-    {
-        $rows = \App\Models\Enrollment::with(['user','cohort','cohort.course'])
-            ->whereIn('status', ['preinscripto','pendiente_pago'])
-            ->orderByRaw("FIELD(status,'pendiente_pago','preinscripto')")
-            ->orderByDesc('updated_at')
-            ->paginate(30);
-
-        return view('admin.academic.preinscriptions.index', compact('rows'));
-    }
-
-    public function markInscripto(\App\Models\Enrollment $enrollment)
-    {
-        if (!in_array($enrollment->status, ['inscripto','baja'], true)) {
-            $enrollment->status = 'inscripto';
-            $enrollment->save();
-        }
-
-        return back()->with('ok', 'Inscripción marcada como INSCRIPTO.');
-    }
 
 
 }
