@@ -8,8 +8,6 @@ use App\Models\Cohort;
 use Illuminate\Http\Request;
 
 
-
-
 class CohortsController extends Controller
 {
     public function create(Course $course)
@@ -40,7 +38,6 @@ class CohortsController extends Controller
     ->with('ok', 'Cohorte creada');
 
     }
-
 
 
 public function index(Course $course)
@@ -88,6 +85,22 @@ public function update(Request $request, Course $course, Cohort $cohort)
     return redirect()
         ->route('admin.academic.cohorts.edit', [$course, $cohort])
         ->with('ok', 'Cohorte actualizada.');
+}
+public function destroy(Course $course, Cohort $cohort)
+{
+    abort_unless($cohort->course_id === $course->id, 404);
+
+    // Seguridad: no borrar si ya tiene matrículas
+    $hasEnrollments = \App\Models\Enrollment::where('cohort_id', $cohort->id)->exists();
+    if ($hasEnrollments) {
+        return back()->with('err', 'No se puede eliminar: la cohorte ya tiene matrículas.');
+    }
+
+    $cohort->delete();
+
+    return redirect()
+        ->route('admin.academic.cohorts.index', $course)
+        ->with('ok', 'Cohorte eliminada.');
 }
 
 }

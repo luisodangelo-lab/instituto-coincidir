@@ -73,6 +73,10 @@ Route::prefix('admin/academic')
     ->name('admin.academic.enrollments.mark_inscripto');
 
 
+Route::delete('admin/academic/courses/{course}/cohorts/{cohort}', [CohortsController::class, 'destroy'])
+  ->name('admin.academic.cohorts.destroy');
+
+
     Route::get('/preinscripciones', [AcademicEnrollmentsController::class,'preinscriptions'])
     ->middleware('role:admin,staff_l1,administrativo')
     ->name('admin.academic.preinscriptions.index');

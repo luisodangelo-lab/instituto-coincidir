@@ -26,8 +26,8 @@
 
   <div class="ic-toolbar">
     <a class="btn btn-primary" href="{{ route('admin.academic.courses.create') }}">+ Crear curso</a>
-    <a class="btn btn-ghost" href="{{ route('admin.academic.enrollments.create') }}">+ Nueva matrícula</a>
-    <a class="btn btn-ghost" href="{{ route('admin.academic.cohorts.index', $c) }}">Cohortes</a>
+   
+    
 
   </div>
 
