@@ -33,52 +33,60 @@
     @error('modality') <div class="invalid-feedback">{{ $message }}</div> @enderror
   </div>
 
-  {{-- Activo + Aprobado (dropdowns juntos) --}}
-  <div class="col-md-2">
+{{-- Estado (juntos y con Sí/No) --}}
+<div class="row g-3">
+  <div class="col-md-6">
     <label class="form-label">Activo (visible)</label>
-    @php $act = (string)old('is_active', isset($course) ? (int)($course->is_active ?? 1) : 1); @endphp
-    <select name="is_active" class="form-select @error('is_active') is-invalid @enderror">
-      <option value="1" {{ $act==='1'?'selected':'' }}>Sí</option>
-      <option value="0" {{ $act==='0'?'selected':'' }}>No</option>
+    <select name="is_active" class="form-select">
+      <option value="1" @selected((string)old('is_active', $course->is_active ?? '1') === '1')>Sí</option>
+      <option value="0" @selected((string)old('is_active', $course->is_active ?? '1') === '0')>No</option>
     </select>
-    @error('is_active') <div class="invalid-feedback">{{ $message }}</div> @enderror
   </div>
 
-  <div class="col-md-2">
+  <div class="col-md-6">
     <label class="form-label">Aprobado por Ministerio</label>
-    @php $ap = (string)old('ministry_approved', isset($course) ? (int)($course->ministry_approved ?? 0) : 0); @endphp
-    <select name="ministry_approved" class="form-select @error('ministry_approved') is-invalid @enderror">
-      <option value="1" {{ $ap==='1'?'selected':'' }}>Sí</option>
-      <option value="0" {{ $ap==='0'?'selected':'' }}>No</option>
+    <select name="ministry_approved" class="form-select">
+      <option value="1" @selected((string)old('ministry_approved', $course->ministry_approved ?? '0') === '1')>Sí</option>
+      <option value="0" @selected((string)old('ministry_approved', $course->ministry_approved ?? '0') === '0')>No</option>
     </select>
-    @error('ministry_approved') <div class="invalid-feedback">{{ $message }}</div> @enderror
   </div>
+</div>
 
-  {{-- Descripción + Ejes (lado a lado y anchos) --}}
-  <div class="col-lg-6">
+{{-- Descripción + Ejes lado a lado (más anchos y altos) --}}
+<div class="row g-3 mt-1">
+  <div class="col-md-6">
     <label class="form-label">Descripción breve</label>
-    <textarea name="description" rows="7"
-              class="form-control @error('description') is-invalid @enderror"
-              style="max-width:none">{{ old('description', $course->description ?? '') }}</textarea>
-    @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    <textarea
+      name="description"
+      class="form-control"
+      rows="8"
+      style="min-height:220px; resize:vertical;"
+    >{{ old('description', $course->description ?? '') }}</textarea>
   </div>
 
-  <div class="col-lg-6">
+  <div class="col-md-6">
     <label class="form-label">Ejes / núcleos temáticos</label>
-    <textarea name="axes" rows="7"
-              class="form-control @error('axes') is-invalid @enderror"
-              style="max-width:none">{{ old('axes', $course->axes ?? '') }}</textarea>
-    @error('axes') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    <textarea
+      name="axes"
+      class="form-control"
+      rows="8"
+      style="min-height:220px; resize:vertical;"
+    >{{ old('axes', $course->axes ?? '') }}</textarea>
   </div>
+</div>
 
-  {{-- Contenidos (debajo, ancho completo) --}}
+{{-- Contenidos full width (más grande) --}}
+<div class="row g-3 mt-1">
   <div class="col-12">
     <label class="form-label">Contenidos</label>
-    <textarea name="contents" rows="8"
-              class="form-control @error('contents') is-invalid @enderror"
-              style="max-width:none">{{ old('contents', $course->contents ?? '') }}</textarea>
-    @error('contents') <div class="invalid-feedback">{{ $message }}</div> @enderror
+    <textarea
+      name="contents"
+      class="form-control"
+      rows="10"
+      style="min-height:260px; resize:vertical;"
+    >{{ old('contents', $course->contents ?? '') }}</textarea>
   </div>
+</div>
 
   <div class="col-12"><hr class="my-2"></div>
 

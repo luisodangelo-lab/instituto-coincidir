@@ -9,7 +9,9 @@
   @endphp
 
   @if($canEdit)
-    <p><a href="{{ route('admin.courses.create') }}">+ Crear curso</a></p>
+    <a class="btn btn-primary" href="{{ url('/admin/academic/courses/create') }}">+ Crear curso</a>
+<a class="btn btn-ghost"  href="{{ url('/admin/academic/enrollments/create') }}">+ Nueva matrícula</a>
+
   @endif
 
   <table style="width:100%; border-collapse:collapse;">
