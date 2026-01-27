@@ -53,12 +53,16 @@
     <div style="height:10px"></div>
 
     <label>Precio total</label>
-    <input name="price_total" value="{{ old('price_total', 0) }}">
+<input type="number" name="price_total" class="form-control"
+       value="{{ old('price_total', 80000) }}">
+
 
     <div style="height:10px"></div>
 
     <label>Cantidad de cuotas (1..10)</label>
-    <input name="installments_count" value="{{ old('installments_count', 1) }}">
+    <input type="number" name="installments_count" class="form-control"
+       value="{{ old('installments_count', 2) }}">
+
 
     <div style="height:10px"></div>
 

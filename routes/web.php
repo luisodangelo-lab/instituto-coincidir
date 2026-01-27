@@ -81,6 +81,19 @@ Route::prefix('admin/academic')
     ->middleware('role:admin,staff_l1,administrativo')
     ->name('admin.academic.enrollments.mark_inscripto');
 
+Route::get('admin/academic/courses/{course}/cohorts/{cohort}/edit', [CohortsController::class, 'edit'])
+  ->name('admin.academic.cohorts.edit');
+
+Route::put('admin/academic/courses/{course}/cohorts/{cohort}', [CohortsController::class, 'update'])
+  ->name('admin.academic.cohorts.update');
+Route::get('admin/academic/courses/{course}/cohorts', [CohortsController::class, 'index'])
+  ->name('admin.academic.cohorts.index');
+
+Route::get('admin/academic/courses/{course}/cohorts/{cohort}/edit', [CohortsController::class, 'edit'])
+  ->name('admin.academic.cohorts.edit');
+
+Route::put('admin/academic/courses/{course}/cohorts/{cohort}', [CohortsController::class, 'update'])
+  ->name('admin.academic.cohorts.update');
 
     Route::get('/', fn() => redirect()->route('admin.academic.courses.index'))
       ->name('admin.academic.home');
