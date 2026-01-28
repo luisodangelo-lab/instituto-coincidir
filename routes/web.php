@@ -28,6 +28,8 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\PreinscriptionController;
 
 
+
+
 use App\Http\Controllers\PublicEnrollmentController;
 
 Route::get('/inscribirme/{course}', [PublicEnrollmentController::class, 'show'])
@@ -73,26 +75,7 @@ Route::prefix('admin/academic')
     ->name('admin.academic.enrollments.mark_inscripto');
 
 
-Route::delete('admin/academic/courses/{course}/cohorts/{cohort}', [CohortsController::class, 'destroy'])
-  ->name('admin.academic.cohorts.destroy');
-
-
-    Route::get('/preinscripciones', [AcademicEnrollmentsController::class,'preinscriptions'])
-    ->middleware('role:admin,staff_l1,administrativo')
-    ->name('admin.academic.preinscriptions.index');
-
-    Route::post('/enrollments/{enrollment}/mark-inscripto', [AcademicEnrollmentsController::class,'markInscripto'])
-    ->middleware('role:admin,staff_l1,administrativo')
-    ->name('admin.academic.enrollments.mark_inscripto');
-
-Route::get('admin/academic/courses/{course}/cohorts/{cohort}/edit', [CohortsController::class, 'edit'])
-  ->name('admin.academic.cohorts.edit');
-
-Route::put('admin/academic/courses/{course}/cohorts/{cohort}', [CohortsController::class, 'update'])
-  ->name('admin.academic.cohorts.update');
-Route::get('admin/academic/courses/{course}/cohorts', [CohortsController::class, 'index'])
-  ->name('admin.academic.cohorts.index');
-
+  
 Route::get('admin/academic/courses/{course}/cohorts/{cohort}/edit', [CohortsController::class, 'edit'])
   ->name('admin.academic.cohorts.edit');
 
