@@ -8,6 +8,32 @@
     <a class="btn btn-ghost" href="{{ route('admin.academic.cohorts.index', $course) }}">Volver a cohortes</a>
   </div>
 
+<div class="card mb-3">
+  <div class="card-body d-flex align-items-center gap-3">
+
+    <div class="flex-grow-1">
+      <div class="fw-semibold" style="font-size:18px;">
+        {{ $course->title }}
+      </div>
+
+      <div class="text-muted small">
+        Cohorte:
+        {{ $cohort->label ?? $cohort->name ?? 'Sin nombre' }}
+        · {{ $cohort->installments_count }} cuotas
+        · ${{ number_format($cohort->price_total ?? 0, 0, ',', '.') }}
+      </div>
+    </div>
+
+    @if(!empty($course->cover_path))
+      <img src="{{ asset('storage/'.$course->cover_path) }}"
+           alt="Portada curso"
+           style="width:80px;height:80px;object-fit:cover;border-radius:10px">
+    @endif
+
+  </div>
+</div>
+
+
   <div class="row g-3">
     <div class="col-lg-8">
       <form method="POST" action="{{ route('admin.academic.cohorts.update', [$course, $cohort]) }}">
