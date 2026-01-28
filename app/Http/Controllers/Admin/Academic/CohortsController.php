@@ -103,4 +103,17 @@ public function destroy(Course $course, Cohort $cohort)
         ->with('ok', 'Cohorte eliminada.');
 }
 
+
+use App\Models\Cohort;
+
+public function all()
+{
+    $cohorts = Cohort::with('course')
+        ->orderByDesc('id')
+        ->paginate(30);
+
+    return view('admin.academic.cohorts_all', compact('cohorts'));
+}
+
+
 }

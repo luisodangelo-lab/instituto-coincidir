@@ -362,21 +362,46 @@ textarea{
     }
 
 .dd-sub { position: relative; }
+
+/* submenú */
 .dd-submenu{
   display:none;
   position:absolute;
-  top:0;
+  top:-6px;              /* lo subimos un poquito para que “calce” */
   left:100%;
-  min-width:220px;
-  margin-left:8px;
+  min-width:240px;
+  margin-left:6px;       /* menos espacio = menos corte */
   background: rgba(8,23,44,.98);
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 12px;
   padding: 8px;
-  z-index: 50;
+  z-index: 9999;
 }
-.dd-sub:hover > .dd-submenu { display:block; }
-.dd-sub-btn { width:100%; text-align:left; background:none; border:0; }
+
+/* ✅ que se mantenga abierto si estás arriba del botón O del submenú */
+.dd-sub:hover > .dd-submenu,
+.dd-submenu:hover{
+  display:block;
+}
+
+/* botón del submenú */
+.dd-sub-btn{
+  width:100%;
+  text-align:left;
+  background:none;
+  border:0;
+}
+
+/* ✅ puente invisible entre el item y el submenú (evita que “se caiga”) */
+.dd-sub::after{
+  content:"";
+  position:absolute;
+  top:-8px;
+  right:-14px;
+  width:16px;
+  height:calc(100% + 16px);
+}
+
 
 
 
@@ -538,9 +563,9 @@ textarea{
         </a>
 
         {{-- Cohortes: entrás por Cursos y elegís curso --}}
-        <a class="dd-item" href="{{ route('admin.academic.courses.index') }}">
-          <span>👥 Cohortes</span><span style="opacity:.65;">→</span>
-        </a>
+        <a class="dd-item" href="{{ route('admin.academic.cohorts.all') }}">
+  <span>👥 Cohortes</span><span style="opacity:.65;">→</span>
+</a>
       @endif
     </div>
   </div>

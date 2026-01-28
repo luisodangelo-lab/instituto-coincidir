@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Course;
+use App\Models\Cohort;
 
 class Cohort extends Model
 {
@@ -26,4 +28,12 @@ class Cohort extends Model
     {
         return $this->hasMany(Enrollment::class);
     }
+
+    public function cohorts()
+{
+    return $this->hasMany(Cohort::class);
+}
+
+
+
 }

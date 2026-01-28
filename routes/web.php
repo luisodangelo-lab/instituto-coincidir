@@ -99,6 +99,11 @@ Route::get('admin/academic/courses/{course}/cohorts/{cohort}/edit', [CohortsCont
 Route::put('admin/academic/courses/{course}/cohorts/{cohort}', [CohortsController::class, 'update'])
   ->name('admin.academic.cohorts.update');
 
+Route::get('admin/academic/cohorts', [\App\Http\Controllers\Admin\Academic\CohortsController::class, 'all'])
+  ->name('admin.academic.cohorts.all');
+
+
+
     Route::get('/', fn() => redirect()->route('admin.academic.courses.index'))
       ->name('admin.academic.home');
 
