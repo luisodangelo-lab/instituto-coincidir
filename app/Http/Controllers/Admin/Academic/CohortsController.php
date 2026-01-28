@@ -8,6 +8,7 @@ use App\Models\Cohort;
 use Illuminate\Http\Request;
 
 
+
 class CohortsController extends Controller
 {
     public function create(Course $course)
@@ -104,7 +105,7 @@ public function destroy(Course $course, Cohort $cohort)
 }
 
 
-use App\Models\Cohort;
+
 
 public function all()
 {
