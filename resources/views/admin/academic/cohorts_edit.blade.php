@@ -119,11 +119,7 @@
       <div class="card">
         <div class="card-body">
           <div class="fw-semibold mb-2">{{ $course->code }} — {{ $course->title }}</div>
-          @if(!empty($course->cover_path))
-            <img src="{{ asset('storage/'.$course->cover_path) }}" class="img-fluid rounded" alt="Portada curso">
-          @else
-            <div class="text-muted small">Sin imagen cargada.</div>
-          @endif
+         
         </div>
       </div>
     </div>
