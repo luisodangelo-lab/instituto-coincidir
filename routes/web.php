@@ -19,7 +19,7 @@ use App\Http\Controllers\Admin\FinancePaymentsController;
 use App\Http\Controllers\My\MyInstallmentsController;
 use App\Http\Controllers\My\MyPaymentsController;
 
-
+use App\Http\Controllers\Admin\Academic\CohortsController;
 use App\Http\Controllers\Admin\Academic\CoursesController as AcademicCoursesController;
 use App\Http\Controllers\Admin\Academic\EnrollmentsController as AcademicEnrollmentsController;
 
@@ -65,32 +65,32 @@ Route::prefix('admin/academic')
     // Cohortes (global + por curso)
     // =========================
     // Listado global de cohortes (para tu menú "Cohortes")
-    Route::get('/cohorts', [AcademicCohortsController::class, 'all'])
+    Route::get('/cohorts', [CohortsController
       ->middleware('role:admin,staff_l1,administrativo')
       ->name('admin.academic.cohorts.all');
 
     // Listado por curso
-    Route::get('/courses/{course}/cohorts', [AcademicCohortsController::class,'index'])
+    Route::get('/courses/{course}/cohorts', [CohortsController])
       ->middleware('role:admin,staff_l1,administrativo')
       ->name('admin.academic.cohorts.index');
 
-    Route::get('/courses/{course}/cohorts/create', [AcademicCohortsController::class,'create'])
+    Route::get('/courses/{course}/cohorts/create', [CohortsController'])
       ->middleware('role:admin,staff_l1,administrativo')
       ->name('admin.academic.cohorts.create');
 
-    Route::post('/courses/{course}/cohorts', [AcademicCohortsController::class,'store'])
+    Route::post('/courses/{course}/cohorts', [CohortsController])
       ->middleware('role:admin,staff_l1,administrativo')
       ->name('admin.academic.cohorts.store');
 
-    Route::get('/courses/{course}/cohorts/{cohort}/edit', [AcademicCohortsController::class,'edit'])
+    Route::get('/courses/{course}/cohorts/{cohort}/edit', [CohortsController
       ->middleware('role:admin,staff_l1,administrativo')
       ->name('admin.academic.cohorts.edit');
 
-    Route::put('/courses/{course}/cohorts/{cohort}', [AcademicCohortsController::class,'update'])
+    Route::put('/courses/{course}/cohorts/{cohort}', [CohortsController])
       ->middleware('role:admin,staff_l1,administrativo')
       ->name('admin.academic.cohorts.update');
 
-    Route::delete('/courses/{course}/cohorts/{cohort}', [AcademicCohortsController::class,'destroy'])
+    Route::delete('/courses/{course}/cohorts/{cohort}', [CohortsController'])
       ->middleware('role:admin,staff_l1,administrativo')
       ->name('admin.academic.cohorts.destroy');
 
